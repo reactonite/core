@@ -11,20 +11,20 @@ Reactonite is a free and open source wrapper for react which lets a person write
 
 ## Table of Contents
 
-- [Introduction](#1.-introduction)
-  - [Purpose](#1.1.-purpose)
-  - [Background](#1.2.-background)
-  - [Intended Audience](#1.3.-intended-audience)
-  - [Project Scope](#1.4.-project-scope)
-  - [Glossary](#1.5.-glossary)
-  - [Abbreviations](#1.6.-abbreviations)
-- [System Description](#2.-system-description)
-  - [Product Features](#2.1.-product-features)
-  - [Operating Environment](#2.2.-operating-environment)
-  - [Functional Requirements](#2.3.-functional-requirements)
-    - [High Priority](#2.3.1.-high-priority)
-    - [Medium Priority](#2.3.2.-medium-priority)
-    - [Low Priority](#2.3.3.-low-priority)
+- [Introduction](#1-introduction)
+  - [Purpose](#11-purpose)
+  - [Background](#12-background)
+  - [Intended Audience](#13-intended-audience)
+  - [Project Scope](#14-project-scope)
+  - [Glossary](#15-glossary)
+  - [Abbreviations](#16-abbreviations)
+- [System Description](#2-system-description)
+  - [Product Features](#21-product-features)
+  - [Operating Environment](#22-operating-environment)
+  - [Functional Requirements](#23-functional-requirements)
+    - [High Priority](#231-high-priority)
+    - [Medium Priority](#232-medium-priority)
+    - [Low Priority](#233-low-priority)
 
 ## 1. Introduction
 

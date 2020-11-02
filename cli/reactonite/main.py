@@ -2,6 +2,7 @@ import os
 import click
 
 from reactonite.node_wrapper import node_wrapper
+from reactonite.watcher import reactonite_watcher
 
 
 @click.group()
@@ -40,3 +41,10 @@ def create_empty_project(project_name):
     npm.create_react_app()
 
     # Transpile once
+
+
+@cli.command()
+@click.argument('watch_dir')
+def watch(watch_dir):
+    watcher = reactonite_watcher(watch_dir)
+    watcher.start()

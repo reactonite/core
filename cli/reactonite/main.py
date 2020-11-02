@@ -25,6 +25,7 @@ def create_empty_project(project_name):
     config_file_path = os.path.join(project_dir, "config.json")
 
     # Create working dir and static dir
+    os.makedirs(project_dir)
     os.makedirs(dist_dir)
     os.makedirs(src_dir)
     os.makedirs(static_dir)

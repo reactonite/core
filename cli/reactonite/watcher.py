@@ -4,7 +4,13 @@ from watchdog.events import PatternMatchingEventHandler
 
 
 class reactonite_watcher():
-    def __init__(self, dir, patterns="*", ignore_patterns="", ignore_directories=False, case_sensitive=True, recursive=True):
+    def __init__(self,
+                 dir,
+                 patterns="*",
+                 ignore_patterns="",
+                 ignore_directories=False,
+                 case_sensitive=True,
+                 recursive=True):
         self.dir = dir
         self.patterns = patterns
         self.ignore_patterns = ignore_patterns

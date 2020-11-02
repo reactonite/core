@@ -12,9 +12,10 @@ class Reactonite:
     def __init__(self):
         pass
 
-    def __cleanBuildFolderIfExists(self):
+    def __cleanBuildFolderIfExists(self, verbose=True):
         if(os.path.isdir(DEST_STATIC_DIR_PATH)):
-            print('Build folder exists at', DEST_STATIC_DIR_PATH, '. cleaning!')
+            if verbose:
+                print('Build folder exists at', DEST_STATIC_DIR_PATH, '. cleaning!')
             for root, dirs, files in os.walk(DEST_STATIC_DIR_PATH):
                 for innerDir in dirs:
                     shutil.rmtree(os.path.join(root, innerDir))
@@ -23,11 +24,13 @@ class Reactonite:
         else:
             os.mkdir(DEST_STATIC_DIR_PATH)
 
-    def __copyStaticFolderToBuild(self):
-        print('Copying static folder to build directory')
+    def __copyStaticFolderToBuild(self, verbose=True):
+        if verbose:
+            print('Copying static folder to build directory')
+        # TODO: Handle permissions issue
         shutil.copytree(SRC_STATIC_DIR_PATH, DEST_STATIC_DIR_PATH)
 
-    def __transpileFile(self, filepath, verbose):
+    def __transpileFile(self, filepath, verbose=True):
         _, filename = os.path.split(filepath)
         filenameWithNoExtension, file_extension = os.path.splitext(filename)
 
@@ -52,21 +55,19 @@ class Reactonite:
                 """.format(function=function)
             )
         
-    def __transpileSrc(self, verbose):
+    def __transpileSrc(self, verbose=True):
         # create build folder dir
-        if verbose:
-            print("Cleaning build folder...")
-        self.__cleanBuildFolderIfExists()
+        self.__cleanBuildFolderIfExists(verbose)
         
         # Copy all static assets if exists 
         if(os.path.isdir(DEFAULTS.STATIC_DIR)):
             if verbose:
-                print("Coping static files...")
-            self.__copyStaticFolderToBuild()
+                print("Coping static files")
+            self.__copyStaticFolderToBuild(verbose)
         
         # Transpile all files
         if verbose:
-            print("Transpiling files...")
+            print("Transpiling files")
 
         # TODO: Loop through all files/dirs in src folder except static(NAME_STATIC_FOLDER) dir
         filepath = SRC_ENTRY_POINT_PATH

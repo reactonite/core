@@ -1,2 +1,0 @@
-beautifulsoup4==4.9.2
-soupsieve==2.0.1

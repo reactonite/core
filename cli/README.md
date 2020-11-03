@@ -1,68 +1,150 @@
-# Reactonite
+<p align="center">
+   <img src="https://user-images.githubusercontent.com/32339251/95760847-2265f880-0cc9-11eb-8cd5-ca641cea0771.png" alt="" width="160" />
+   <h3 align="center">Reactonite</h3>
+   <p align="center">
+      A transpiler to convert HTML to React code and PWAs ✨
+      </br>
+      <a href="https://github.com/SDOS2020/Team_3_Reactonite/#table-of-contents"><strong>Explore the docs »</strong></a>
+      <br/>
+      <a href="https://github.com/SDOS2020/Team_3_Reactonite/issues">Report Bug</a> . <a href="https://github.com/SDOS2020/Team_3_Reactonite/projects">View Project</a>
+   </p>
+</p>
 
-Transpiler to convert HTML to React
+<!-- TABLE OF CONTENTS -->
 
-## How to setup
+## Table of Contents
 
-1. Use a virtual environment?
+- [About the Project](#about-the-project)
+  - [Built With](#built-with)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+
+<!-- ABOUT THE PROJECT -->
+
+## About The Project
+
+Reactonite is a free and open source wrapper for react which lets a person write vanilla html code and convert it to a react code easily, hence building a PWA, SPA.
+
+Here's the key features added to Reactonite:
+
+- Transpile HTML code to React website
+- Create PWAs and React applications as quickly as possible
+- Act as a wrapper to NPM
+- Allow importing of already created HTML file components
+- Hot Reloading
+- Support custom scss, styled-components, material icons etc. :smile:
+
+### Built With
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
+
+<!-- GETTING STARTED -->
+
+## Getting Started
+
+To get this repo up and running on your local machine follow these simple steps.
+
+### Prerequisites
+
+Here's a list of things you'll need to have prior to installing the software.
+
+- python
+- npm
+- nodejs
+- any modern web browser
+
+### Installation
+
+1. Setup virtual environment?
+
+```sh
+$ virtualenv venv
+```
+
+> Not necessary but recommended to keep your environment clean.
+> Dont forget to activate it.
+
+2. Clone the repository to local machine.
+
+```sh
+$ git clone https://github.com/SDOS2020/Team_3_Reactonite.git
+```
+
 2. Install the package either using pip or python setup tools
 
-   ```bash
-   python setup.py install # Use `develop` instead of `install` to get an editable build
-   or
-   pip install .
-   ```
+```sh
+# goto cli directory
+$ cd cli
 
-3. Call `reactonite` from the command line.
+$ python setup.py install
+# Use `develop` instead of `install` to get an editable build
 
-   ```bash
-   $ reactonite --help
-   Usage: reactonite [OPTIONS] COMMAND [ARGS]...
+# Alternatively run
+$ pip install .
+```
 
-   Options:
-     --help  Show this message and exit.
+3. You are good to go... 🎉
 
-   Commands:
-     create-empty-project
-   ```
+<!-- USAGE EXAMPLES -->
 
-## Current Features
+## Usage
 
-- [x] Create a react app from the command line by:
+Once installed here are the commands that will allow you to create Reactonite projects.
 
-  ```bash
-  reactonite create-empty-project my-new-app
-  ```
+### `reactonite --help`
 
-- [ ] Create a react app from a given HTML file.
-- [ ] Specify a react app dir and an HTML file to update an existitng project.
+Opens the help page for `reactonite` commandline.
 
-# Reactonite Core Transpiler
+```sh
+$ reactonite --help
+Usage: reactonite [OPTIONS] COMMAND [ARGS]...
 
-## How to setup
+Options:
+  --help  Show this message and exit.
 
-1. Use a virtual environment?
-2. Install the required packages using pip.
+Commands:
+  create-empty-project
+```
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+### `reactonite create-empty-project APP_NAME`
 
-3. Write your code in `src` folder basic file structure is already provided.
-   > Note: If not already present use `reactonite-cli` to create a react app and set corresponding path in `main.py`
-4. Call `main.py` from the command line to run the transpiler.
+Creates a reactonite app project with required directory structure. Change `APP_NAME` to your app name.
 
-   ```bash
-   python main.py
-   ```
+```sh
+$ reactonite create-empty-project my-new-app
+```
 
-## Current Features
+<!-- ROADMAP -->
 
-- [x] Transpiles index.html files inside src folder to react app and copies static files
+## Roadmap
 
-  ```bash
-  python main.py
-  ```
+See the [open issues](https://github.com/SDOS2020/Team_3_Reactonite/issues) for a list of proposed features (and known issues). You can also track where the project is going in further releases just visit the [projects](https://github.com/SDOS2020/Team_3_Reactonite/projects) tab.
 
-- [ ] Convert all \*.html
-- [ ] Auto create-react-app on first install
+<!-- CONTRIBUTING -->
+
+## Contributing
+
+Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**. For complete contributing guide please read our [code of conduct](https://github.com/SDOS2020/Team_3_Reactonite/blob/beta/CONTRIBUTING.md).
+
+<!-- LICENSE -->
+
+## License
+
+License yet to be decided. See `LICENSE` for more information once complete.
+
+<!-- CONTACT -->
+
+## Contact
+
+- Amogh Gulati - amogh17019@iiitd.ac.in
+- Aniket Pradhan - aniket17133@iiitd.ac.in
+- Avi Garg - avi17223@iiitd.ac.in
+- Chirag Jain - chirag17041@iiitd.ac.in
+
+Project Link: [https://github.com/SDOS2020/Team_3_Reactonite](https://github.com/SDOS2020/Team_3_Reactonite)

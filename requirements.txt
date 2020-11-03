@@ -4,3 +4,5 @@ mccabe==0.6.1
 pycodestyle==2.6.0
 pyflakes==2.2.0
 watchdog==0.10.3 
+beautifulsoup4==4.9.2	
+soupsieve==2.0.1

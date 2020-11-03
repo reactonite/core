@@ -52,7 +52,7 @@ def cli():
 
 @cli.command()
 @click.argument('project-name')
-def create_empty_project(project_name):
+def create_project(project_name):
 
     # TODO: Check if project_name is valid
 

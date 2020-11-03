@@ -79,9 +79,6 @@ $ git clone https://github.com/SDOS2020/Team_3_Reactonite.git
 2. Install the package either using pip or python setup tools
 
 ```sh
-# goto cli directory
-$ cd cli
-
 $ python setup.py install
 # Use `develop` instead of `install` to get an editable build
 
@@ -109,15 +106,15 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  create-empty-project
+  create-project
 ```
 
-### `reactonite create-empty-project APP_NAME`
+### `reactonite create-project PROJECT_NAME`
 
-Creates a reactonite app project with required directory structure. Change `APP_NAME` to your app name.
+Creates a reactonite app project with required directory structure. Change `PROJECT_NAME` to your app name.
 
 ```sh
-$ reactonite create-empty-project my-new-app
+$ reactonite create-project my-new-project
 ```
 
 <!-- ROADMAP -->

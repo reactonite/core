@@ -11,10 +11,10 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="reactonite",
     version=version,
-    description="HTML to React",
+    description="Transpile HTML to React",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/reactonite",
+    url="https://github.com/SDOS2020/Team_3_Reactonite",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

@@ -107,6 +107,7 @@ Options:
 
 Commands:
   create-project
+  watch
 ```
 
 ### `reactonite create-project PROJECT_NAME`

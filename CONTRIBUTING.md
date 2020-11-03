@@ -93,6 +93,6 @@ available at [http://contributor-covenant.org/version/1/4][version]
 
 [homepage]: http://contributor-covenant.org
 [version]: http://contributor-covenant.org/version/1/4/
-[contact]: https://github.com/SDOS2020/Team_3_Reactonite#contact
+[contact]: https://github.com/SDOS2020/Team_3_Reactonite/#contact
 
 [sourced from](https://gist.github.com/PurpleBooth/b24679402957c63ec426)

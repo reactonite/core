@@ -1,13 +1,23 @@
 import os
-import click
-from reactonite.config import DEFAULTS
 
+import click
+
+from reactonite.config import DEFAULTS
 from reactonite.node_wrapper import node_wrapper
-from reactonite.watcher import reactonite_watcher
 from reactonite.transpiler import Transpiler
+from reactonite.watcher import reactonite_watcher
 
 
 def init_html_file(filepath):
+    """Generates init html file and is called when a
+    new project is created.
+
+    Parameters
+    ----------
+    filepath : str
+        Filepath with name for init html file.
+    """
+
     with open(filepath, 'w') as file:
         file.write(
             """
@@ -19,7 +29,8 @@ def init_html_file(filepath):
 </head>
 
 <body>
-<p>This is example statement. Anything inside the <strong>body</strong> tag will appear on the page, just
+<p>This is example statement. Anything inside the <strong>body</strong> tag
+will appear on the page, just
     like this
     <strong>p</strong> tag and it contents.</p>
 </body>
@@ -30,29 +41,67 @@ def init_html_file(filepath):
 
 
 def create_dir(path):
+    """Creates directory at the given path if it doesn't exist.
+
+    Parameters
+    ----------
+    path : str
+        Path to directory which needs to be created.
+
+    Raises
+    ------
+    RuntimeError
+        Raised if directory can't be created.
+    """
+
     if os.path.isdir(path):
         print("{} already exists. Skipping.".format(path))
         return
 
     os.makedirs(path)
     if not os.path.isdir(path):
-        raise Exception('Folder can not be created at', path)
+        raise RuntimeError('Folder can not be created at', path)
 
 
 def create_file(path):
+    """Creates the file at the given path if it doesn't exist.
+
+    Parameters
+    ----------
+    path : str
+        Path to file which needs to be created.
+
+    Raises
+    ------
+    RuntimeError
+        Raised if file can't be created.
+    """
+
     open(path, 'w').close()
     if not os.path.isfile(path):
-        raise Exception('File can not be created at', path)
+        raise RuntimeError('File can not be created at', path)
 
 
 @click.group()
 def cli():
+    """Entry point for reactonite cli."""
+
     pass
 
 
 @cli.command()
 @click.argument('project-name')
 def create_project(project_name):
+    """Command for creating new reactonite project from scratch.
+
+    Creates a new reactonite project with given PROJECT_NAME and installs npm
+    packages along with basic directory structure layout.
+
+    Parameters
+    ----------
+    project_name : str
+        Name of the project to be created.
+    """
 
     # TODO: Check if project_name is valid
 
@@ -102,5 +151,15 @@ def create_project(project_name):
 @cli.command()
 @click.argument('watch_dir')
 def watch(watch_dir):
+    """Command for watching for changes and initializing the watcher.
+
+    Starts watching for changes in the specified project directory.
+
+    Parameters
+    ----------
+    watch_dir : str
+        Path of directory to be watched for changes.
+    """
+
     watcher = reactonite_watcher(watch_dir)
     watcher.start()

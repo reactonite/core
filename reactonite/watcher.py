@@ -1,6 +1,7 @@
 import time
-from watchdog.observers import Observer
+
 from watchdog.events import PatternMatchingEventHandler
+from watchdog.observers import Observer
 
 
 class reactonite_watcher():

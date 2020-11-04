@@ -1,7 +1,7 @@
 import os
-from bs4 import BeautifulSoup
-
 from distutils.dir_util import copy_tree
+
+from bs4 import BeautifulSoup
 
 
 class Transpiler:

@@ -77,6 +77,12 @@ class Transpiler:
         ----------
         filepath : str
             Path to the source HTML file which is to be transpiled
+
+        Raises
+        ------
+        RuntimeError
+            Raised if the source html file doesn't have a .html
+            extention
         """
 
         _, filename = os.path.split(filepath)
@@ -84,7 +90,7 @@ class Transpiler:
         filename = filenameWithNoExtension + ".js"
 
         if file_extension != ".html":
-            raise Exception(filename, 'is not a HTML file')
+            raise RuntimeError(filename, 'is not a HTML file')
 
         if self.verbose:
             print("Transpiling file: " + filename)
@@ -112,6 +118,12 @@ export default App;
         directories exist, and the source file is present.
         After that, call __copyStaticFolderToBuild() and
         __transpileFile methods to transpile the source.
+
+        Raises
+        ------
+        RuntimeError
+            Raised if source directory or source html file
+            are missing
         """
 
         # Check if entry point folder exists
@@ -121,11 +133,11 @@ export default App;
                 # Initial checks are done run code
                 pass
             else:
-                raise Exception("Entry point file doesn't exist at",
-                                self.html_file_path)
+                raise RuntimeError("Entry point file doesn't exist at",
+                                   self.html_file_path)
         else:
-            raise Exception("Entry point folder doesn't exist at",
-                            self.src_dir)
+            raise RuntimeError("Entry point folder doesn't exist at",
+                               self.src_dir)
 
         # Copy all static assets if exists
         if(os.path.isdir(self.src_static_dir)):

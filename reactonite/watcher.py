@@ -5,6 +5,43 @@ from watchdog.observers import Observer
 
 
 class reactonite_watcher():
+    """A file/directory watcher to report events incase
+    they are modified/created/deleted.
+
+    Attributes
+    ----------
+    dir : str
+        Path of the directory to watch and report for events.
+    patterns : str, optional
+        Default value = "*"
+        Pattern of files/directories to watch
+    ignore_patterns : str, optional
+        Default value = ""
+        Pattern of files/directories to ignore or not watch
+    ignore_directories : bool, optional
+        Default value = False
+        Parameter whether the watcher should ignore directories or
+        not
+    case sensitive : bool
+        Default value = True
+        Parameter explaining whether file/directory names are
+        case-sensitive or not
+    recursive : bool
+        Default value = True
+        Parameter whether the watcher should recursively watch
+        inside directories or not
+
+    Methods
+    -------
+    start()
+        Runs the watcher for the given directory
+    __on_created()
+        An event in case a file/directory is created
+    __on_deleted()
+        An event in case a file/directory is deleted
+    __on_modified()
+        An event in case a file/directory is modified
+    """
     def __init__(self,
                  dir,
                  patterns="*",
@@ -20,6 +57,10 @@ class reactonite_watcher():
         self.recursive = recursive
 
     def start(self):
+        """Runs the watchdog service on the given path. Handles
+        various events to different functions as per the
+        requirement
+        """
         event_handler = PatternMatchingEventHandler(self.patterns,
                                                     self.ignore_patterns,
                                                     self.ignore_directories,
@@ -45,13 +86,45 @@ class reactonite_watcher():
             observer.join()
 
     def __on_created(self, event):
+        """This event is called when a file/directory
+        is created.
+
+        Parameters
+        ----------
+        event : obj
+            An event object containing necessary details about it.
+        """
         print(f"{event.src_path} has been created!")
 
     def __on_deleted(self, event):
+        """This event is called when a file/directory
+        is deleted.
+
+        Parameters
+        ----------
+        event : obj
+            An event object containing necessary details about it.
+        """
         print(f"deleted {event.src_path}!")
 
     def __on_modified(self, event):
+        """This event is called when a file/directory
+        is modified.
+
+        Parameters
+        ----------
+        event : obj
+            An event object containing necessary details about it.
+        """
         print(f"{event.src_path} has been modified")
 
     def __on_moved(self, event):
+        """This event is called when a file/directory
+        is moved.
+
+        Parameters
+        ----------
+        event : obj
+            An event object containing necessary details about it.
+        """
         print(f"moved {event.src_path} to {event.dest_path}")

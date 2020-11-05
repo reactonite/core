@@ -1,4 +1,5 @@
 import os
+import pkgutil
 
 import click
 
@@ -16,28 +17,22 @@ def init_html_file(filepath):
     ----------
     filepath : str
         Filepath with name for init html file.
+
+    Raises
+    ------
+    FileNotFoundError
+        Raised if init file doesn't exist.
     """
 
-    with open(filepath, 'w') as file:
-        file.write(
-            """
-<!doctype html>
-<html>
+    init_file_content = os.path.join(
+        DEFAULTS.INIT_FILES_DIR,
+        DEFAULTS.INIT_HTML
+    )
 
-<head>
-<title>This is the title of the webpage!</title>
-</head>
+    indexContents = pkgutil.get_data(__name__, init_file_content)
 
-<body>
-<p>This is example statement. Anything inside the <strong>body</strong> tag
-will appear on the page, just
-    like this
-    <strong>p</strong> tag and it contents.</p>
-</body>
-
-</html>
-            """
-        )
+    with open(filepath, 'w') as outfile:
+        outfile.write(indexContents.decode("utf-8"))
 
 
 def create_dir(path):
@@ -105,12 +100,11 @@ def create_project(project_name):
 
     # TODO: Check if project_name is valid
 
-    # Create directory project_name/src
     project_dir = os.path.join(".", project_name)
 
     dist_dir = os.path.join(project_dir, DEFAULTS.DEST_DIR)
     dist_src_dir = os.path.join(dist_dir, DEFAULTS.SRC_DIR)
-    dist_static_dir = os.path.join(dist_dir, DEFAULTS.STATIC_DIR)
+    dist_static_dir = os.path.join(dist_src_dir, DEFAULTS.STATIC_DIR)
 
     src_dir = os.path.join(project_dir, DEFAULTS.SRC_DIR)
 
@@ -124,7 +118,7 @@ def create_project(project_name):
     create_dir(src_dir)
     create_dir(src_static_dir)
 
-    # Create template index.html in src dir
+    # Initial setup of index.html in project/src directory
     create_file(html_file_path)
     init_html_file(html_file_path)
 
@@ -135,6 +129,8 @@ def create_project(project_name):
     npm = node_wrapper(project_name,
                        working_dir=project_dir)
     npm.create_react_app(rename_to=DEFAULTS.DEST_DIR)
+
+    # TODO: NPM src directory setup
 
     # Transpile once
     transpiler = Transpiler(src_dir,

@@ -68,7 +68,7 @@ class Transpiler:
         # TODO: Handle permissions issue
         copy_tree(self.src_static_dir, self.dist_static_dir)
 
-    def __transpileFile(self, filepath):
+    def __transpileFile(self, filepath, is_init_html=False):
         """Transpiles the source HTML file given at the given filepath
         to a React code, which is then copied over to the React build
         directory
@@ -77,6 +77,9 @@ class Transpiler:
         ----------
         filepath : str
             Path to the source HTML file which is to be transpiled
+        is_init_html : bool, optional
+            Set to True if file to be transpiled is init html file as it will
+            be renamed to App.js
 
         Raises
         ------
@@ -87,7 +90,10 @@ class Transpiler:
 
         _, filename = os.path.split(filepath)
         filenameWithNoExtension, file_extension = os.path.splitext(filename)
-        filename = filenameWithNoExtension + ".js"
+        if is_init_html:
+            filename = "App.js"
+        else:
+            filename = filenameWithNoExtension + ".js"
 
         if file_extension != ".html":
             raise RuntimeError(filename, 'is not a HTML file')
@@ -146,4 +152,4 @@ export default App;
         # TODO: Loop through all files/dirs in src folder except
         # static(NAME_STATIC_FOLDER) dir
         filepath = self.html_file_path
-        self.__transpileFile(filepath)
+        self.__transpileFile(filepath, is_init_html=True)

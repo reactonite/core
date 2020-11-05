@@ -30,7 +30,7 @@ def create_dir(path):
 
     os.makedirs(path)
     if not os.path.isdir(path):
-        raise RuntimeError('Folder can not be created at', path)
+        raise RuntimeError('Folder can not be created at ' + str(path))
 
 
 def create_file(path):
@@ -49,7 +49,7 @@ def create_file(path):
 
     open(path, 'w').close()
     if not os.path.isfile(path):
-        raise RuntimeError('File can not be created at', path)
+        raise RuntimeError('File can not be created at ' + str(path))
 
 
 @click.group()
@@ -71,11 +71,36 @@ def create_project(project_name):
     ----------
     project_name : str
         Name of the project to be created.
+
+    Raises
+    ------
+    RuntimeError
+        If project name is invalid.
     """
 
-    # TODO: Check if project_name is valid
+    # Valid project name checks
+    if not project_name.islower():
+        raise RuntimeError(
+            "Invalid project name " +
+            str(project_name) +
+            " must be lower case."
+        )
+
+    if any(c != '-' and not c.isalnum() for c in project_name):
+        raise RuntimeError(
+            "Invalid project name " +
+            str(project_name) +
+            " only - is allowed as a special character."
+        )
 
     project_dir = os.path.join(".", project_name)
+
+    if os.path.exists(project_dir):
+        raise RuntimeError(
+            "Invalid project name " +
+            str(project_name) +
+            " directory already exists."
+        )
 
     dist_dir = os.path.join(project_dir, DEFAULTS.DEST_DIR)
     dist_src_dir = os.path.join(dist_dir, DEFAULTS.SRC_DIR)

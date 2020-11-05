@@ -96,7 +96,7 @@ class Transpiler:
             filename = filenameWithNoExtension + ".js"
 
         if file_extension != ".html":
-            raise RuntimeError(filename, 'is not a HTML file')
+            raise RuntimeError(str(filename) + ' is not a HTML file')
 
         if self.verbose:
             print("Transpiling file: " + filename)
@@ -139,11 +139,11 @@ export default App;
                 # Initial checks are done run code
                 pass
             else:
-                raise RuntimeError("Entry point file doesn't exist at",
-                                   self.html_file_path)
+                raise RuntimeError("Entry point file doesn't exist at " +
+                                   str(self.html_file_path))
         else:
-            raise RuntimeError("Entry point folder doesn't exist at",
-                               self.src_dir)
+            raise RuntimeError("Entry point folder doesn't exist at " +
+                               str(self.src_dir))
 
         # Copy all static assets if exists
         if(os.path.isdir(self.src_static_dir)):

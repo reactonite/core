@@ -1,4 +1,6 @@
 import os
+import sys
+from distutils.dir_util import copy_tree
 
 import click
 
@@ -6,38 +8,6 @@ from reactonite.config import DEFAULTS
 from reactonite.node_wrapper import node_wrapper
 from reactonite.transpiler import Transpiler
 from reactonite.watcher import reactonite_watcher
-
-
-def init_html_file(filepath):
-    """Generates init html file and is called when a
-    new project is created.
-
-    Parameters
-    ----------
-    filepath : str
-        Filepath with name for init html file.
-    """
-
-    with open(filepath, 'w') as file:
-        file.write(
-            """
-<!doctype html>
-<html>
-
-<head>
-<title>This is the title of the webpage!</title>
-</head>
-
-<body>
-<p>This is example statement. Anything inside the <strong>body</strong> tag
-will appear on the page, just
-    like this
-    <strong>p</strong> tag and it contents.</p>
-</body>
-
-</html>
-            """
-        )
 
 
 def create_dir(path):
@@ -60,7 +30,7 @@ def create_dir(path):
 
     os.makedirs(path)
     if not os.path.isdir(path):
-        raise RuntimeError('Folder can not be created at', path)
+        raise RuntimeError('Folder can not be created at ' + str(path))
 
 
 def create_file(path):
@@ -79,7 +49,7 @@ def create_file(path):
 
     open(path, 'w').close()
     if not os.path.isfile(path):
-        raise RuntimeError('File can not be created at', path)
+        raise RuntimeError('File can not be created at ' + str(path))
 
 
 @click.group()
@@ -101,16 +71,40 @@ def create_project(project_name):
     ----------
     project_name : str
         Name of the project to be created.
+
+    Raises
+    ------
+    RuntimeError
+        If project name is invalid.
     """
 
-    # TODO: Check if project_name is valid
+    # Valid project name checks
+    if not project_name.islower():
+        raise RuntimeError(
+            "Invalid project name " +
+            str(project_name) +
+            " must be lower case."
+        )
 
-    # Create directory project_name/src
+    if any(c != '-' and not c.isalnum() for c in project_name):
+        raise RuntimeError(
+            "Invalid project name " +
+            str(project_name) +
+            " only - is allowed as a special character."
+        )
+
     project_dir = os.path.join(".", project_name)
+
+    if os.path.exists(project_dir):
+        raise RuntimeError(
+            "Invalid project name " +
+            str(project_name) +
+            " directory already exists."
+        )
 
     dist_dir = os.path.join(project_dir, DEFAULTS.DEST_DIR)
     dist_src_dir = os.path.join(dist_dir, DEFAULTS.SRC_DIR)
-    dist_static_dir = os.path.join(dist_dir, DEFAULTS.STATIC_DIR)
+    dist_static_dir = os.path.join(dist_src_dir, DEFAULTS.STATIC_DIR)
 
     src_dir = os.path.join(project_dir, DEFAULTS.SRC_DIR)
 
@@ -119,22 +113,24 @@ def create_project(project_name):
 
     config_file_path = os.path.join(project_dir, DEFAULTS.CONFIG_FILE_PATH)
 
-    # Create working dir and static dir
+    # Create project directory
     create_dir(project_dir)
-    create_dir(src_dir)
-    create_dir(src_static_dir)
 
-    # Create template index.html in src dir
-    create_file(html_file_path)
-    init_html_file(html_file_path)
+    # Initial setup of project/src directory
+    package_path = os.path.dirname(sys.modules[__name__].__file__)
+    init_src_dir_path = os.path.join(package_path, DEFAULTS.INIT_FILES_DIR)
+    copy_tree(init_src_dir_path, src_dir)
 
     # Create template config.json in project dir
     create_file(config_file_path)
 
-    # Create npm project
+    # Create react app
     npm = node_wrapper(project_name,
                        working_dir=project_dir)
     npm.create_react_app(rename_to=DEFAULTS.DEST_DIR)
+
+    # Install NPM packages
+    npm.install(package_name='react-helmet', working_dir=dist_dir)
 
     # Transpile once
     transpiler = Transpiler(src_dir,

@@ -17,6 +17,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/SDOS2020/Team_3_Reactonite",
     packages=setuptools.find_packages(),
+    include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",

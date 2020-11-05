@@ -5,8 +5,6 @@ class DEFAULTS:
     ----------
     INIT_FILES_DIR : str
         Directory for initial files for setup.
-    INIT_HTML : str
-        Filename for initial html file setup.
     SRC_DIR : str
         Source directory for reactonite codebase.
     DEST_DIR : str
@@ -21,8 +19,7 @@ class DEFAULTS:
         Parser to be used for transpilation.
     """
 
-    INIT_FILES_DIR = 'init_files'
-    INIT_HTML = 'index.html'
+    INIT_FILES_DIR = 'init_src_dir'
     SRC_DIR = 'src'
     DEST_DIR = 'dist'
     STATIC_DIR = 'static'

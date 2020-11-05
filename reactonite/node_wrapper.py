@@ -17,6 +17,8 @@ class node_wrapper:
     -------
     create_react_app(rename_to=None)
         Creates a new react app and renames it as specified.
+    install(package_name=None)
+        Installs the given package for npm.
     """
 
     def __init__(self,
@@ -35,7 +37,7 @@ class node_wrapper:
             implies same as app name
         """
 
-        subprocess.run(["npx", "create-react-app", self.app_name],
+        subprocess.run(["npx", "create-react-app", self.app_name, "--use-npm"],
                        shell=True,
                        cwd=self.working_dir)
 
@@ -43,3 +45,18 @@ class node_wrapper:
             src = os.path.join(self.working_dir, self.app_name)
             dest = os.path.join(self.working_dir, rename_to)
             os.rename(src, dest)
+
+    def install(self, package_name=None, working_dir=None):
+        """Installs the given package in npm and saves in package.json
+
+        Parameters
+        ----------
+        package_name : str
+            Package to be installed.
+        working_dir : str
+            Directory to execute the command in.
+        """
+
+        subprocess.run(["npm", "i", package_name, "--save"],
+                       shell=True,
+                       cwd=working_dir)

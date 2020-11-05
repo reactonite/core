@@ -1,5 +1,6 @@
 import os
-import pkgutil
+import sys
+from distutils.dir_util import copy_tree
 
 import click
 
@@ -7,32 +8,6 @@ from reactonite.config import DEFAULTS
 from reactonite.node_wrapper import node_wrapper
 from reactonite.transpiler import Transpiler
 from reactonite.watcher import reactonite_watcher
-
-
-def init_html_file(filepath):
-    """Generates init html file and is called when a
-    new project is created.
-
-    Parameters
-    ----------
-    filepath : str
-        Filepath with name for init html file.
-
-    Raises
-    ------
-    FileNotFoundError
-        Raised if init file doesn't exist.
-    """
-
-    init_file_content = os.path.join(
-        DEFAULTS.INIT_FILES_DIR,
-        DEFAULTS.INIT_HTML
-    )
-
-    indexContents = pkgutil.get_data(__name__, init_file_content)
-
-    with open(filepath, 'w') as outfile:
-        outfile.write(indexContents.decode("utf-8"))
 
 
 def create_dir(path):
@@ -113,24 +88,24 @@ def create_project(project_name):
 
     config_file_path = os.path.join(project_dir, DEFAULTS.CONFIG_FILE_PATH)
 
-    # Create working dir and static dir
+    # Create project directory
     create_dir(project_dir)
-    create_dir(src_dir)
-    create_dir(src_static_dir)
 
-    # Initial setup of index.html in project/src directory
-    create_file(html_file_path)
-    init_html_file(html_file_path)
+    # Initial setup of project/src directory
+    package_path = os.path.dirname(sys.modules[__name__].__file__)
+    init_src_dir_path = os.path.join(package_path, DEFAULTS.INIT_FILES_DIR)
+    copy_tree(init_src_dir_path, src_dir)
 
     # Create template config.json in project dir
     create_file(config_file_path)
 
-    # Create npm project
+    # Create react app
     npm = node_wrapper(project_name,
                        working_dir=project_dir)
     npm.create_react_app(rename_to=DEFAULTS.DEST_DIR)
 
-    # TODO: NPM src directory setup
+    # Install NPM packages
+    npm.install(package_name='react-helmet', working_dir=dist_dir)
 
     # Transpile once
     transpiler = Transpiler(src_dir,

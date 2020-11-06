@@ -5,9 +5,9 @@ from distutils.dir_util import copy_tree
 import click
 
 from reactonite.config import DEFAULTS
-from reactonite.node_wrapper import node_wrapper
+from reactonite.node_wrapper import NodeWrapper
 from reactonite.transpiler import Transpiler
-from reactonite.watcher import reactonite_watcher
+from reactonite.watcher import ReactoniteWatcher
 
 
 def create_dir(path):
@@ -125,8 +125,7 @@ def create_project(project_name):
     create_file(config_file_path)
 
     # Create react app
-    npm = node_wrapper(project_name,
-                       working_dir=project_dir)
+    npm = NodeWrapper(project_name, working_dir=project_dir)
     npm.create_react_app(rename_to=DEFAULTS.DEST_DIR)
 
     # Install NPM packages
@@ -157,5 +156,5 @@ def watch(watch_dir):
         Path of directory to be watched for changes.
     """
 
-    watcher = reactonite_watcher(watch_dir)
+    watcher = ReactoniteWatcher(watch_dir)
     watcher.start()

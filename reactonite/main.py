@@ -5,51 +5,10 @@ from distutils.dir_util import copy_tree
 import click
 
 from reactonite.config import DEFAULTS
+from reactonite.helpers import create_dir, create_file, write_to_json_file
 from reactonite.node_wrapper import NodeWrapper
 from reactonite.transpiler import Transpiler
 from reactonite.watcher import ReactoniteWatcher
-
-
-def create_dir(path):
-    """Creates directory at the given path if it doesn't exist.
-
-    Parameters
-    ----------
-    path : str
-        Path to directory which needs to be created.
-
-    Raises
-    ------
-    RuntimeError
-        Raised if directory can't be created.
-    """
-
-    if os.path.isdir(path):
-        print("{} already exists. Skipping.".format(path))
-        return
-
-    os.makedirs(path)
-    if not os.path.isdir(path):
-        raise RuntimeError('Folder can not be created at ' + str(path))
-
-
-def create_file(path):
-    """Creates the file at the given path if it doesn't exist.
-
-    Parameters
-    ----------
-    path : str
-        Path to file which needs to be created.
-
-    Raises
-    ------
-    RuntimeError
-        Raised if file can't be created.
-    """
-
-    open(path, 'w').close()
-    if not os.path.isfile(path):
-        raise RuntimeError('File can not be created at ' + str(path))
 
 
 @click.group()
@@ -112,6 +71,10 @@ def create_project(project_name):
     html_file_path = os.path.join(src_dir, DEFAULTS.HTML_FILE_PATH)
 
     config_file_path = os.path.join(project_dir, DEFAULTS.CONFIG_FILE_PATH)
+    config_settings = {
+        "src_dir": DEFAULTS.SRC_DIR,
+        "dest_dir": DEFAULTS.DEST_DIR
+    }
 
     # Create project directory
     create_dir(project_dir)
@@ -123,6 +86,10 @@ def create_project(project_name):
 
     # Create template config.json in project dir
     create_file(config_file_path)
+    write_to_json_file(
+        config_file_path,
+        content=config_settings
+    )
 
     # Create react app
     npm = NodeWrapper(project_name, working_dir=project_dir)

@@ -30,17 +30,6 @@ class ReactoniteWatcher():
         Default value = True
         Parameter whether the watcher should recursively watch
         inside directories or not
-
-    Methods
-    -------
-    start()
-        Runs the watcher for the given directory
-    __on_created()
-        An event in case a file/directory is created
-    __on_deleted()
-        An event in case a file/directory is deleted
-    __on_modified()
-        An event in case a file/directory is modified
     """
     def __init__(self,
                  dir,

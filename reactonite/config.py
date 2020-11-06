@@ -19,10 +19,11 @@ class DEFAULTS:
         Parser to be used for transpilation.
     """
 
-    INIT_FILES_DIR = 'init_src_dir'
-    SRC_DIR = 'src'
-    DEST_DIR = 'dist'
-    STATIC_DIR = 'static'
-    HTML_FILE_PATH = 'index.html'
-    CONFIG_FILE_PATH = 'config.json'
-    BS_PARSER = 'html.parser'
+    def __init__(self):
+        self.INIT_FILES_DIR = 'init_src_dir'
+        self.SRC_DIR = 'src'
+        self.DEST_DIR = 'dist'
+        self.STATIC_DIR = 'static'
+        self.HTML_FILE_PATH = 'index.html'
+        self.CONFIG_FILE_PATH = 'config.json'
+        self.BS_PARSER = 'html.parser'

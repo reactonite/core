@@ -4,11 +4,11 @@ from distutils.dir_util import copy_tree
 
 import click
 
-from reactonite.config import DEFAULTS
-from reactonite.helpers import create_dir, create_file, write_to_json_file
-from reactonite.node_wrapper import NodeWrapper
-from reactonite.transpiler import Transpiler
-from reactonite.watcher import ReactoniteWatcher
+from .config import DEFAULTS
+from .helpers import create_dir, create_file, write_to_json_file
+from .node_wrapper import NodeWrapper
+from .transpiler import Transpiler
+from .watcher import ReactoniteWatcher
 
 
 @click.group()
@@ -61,19 +61,21 @@ def create_project(project_name):
             " directory already exists."
         )
 
-    dist_dir = os.path.join(project_dir, DEFAULTS.DEST_DIR)
-    dist_src_dir = os.path.join(dist_dir, DEFAULTS.SRC_DIR)
-    dist_static_dir = os.path.join(dist_src_dir, DEFAULTS.STATIC_DIR)
+    CONSTANTS = DEFAULTS()
 
-    src_dir = os.path.join(project_dir, DEFAULTS.SRC_DIR)
+    dist_dir = os.path.join(project_dir, CONSTANTS.DEST_DIR)
+    dist_src_dir = os.path.join(dist_dir, CONSTANTS.SRC_DIR)
+    dist_static_dir = os.path.join(dist_src_dir, CONSTANTS.STATIC_DIR)
 
-    src_static_dir = os.path.join(src_dir, DEFAULTS.STATIC_DIR)
-    html_file_path = os.path.join(src_dir, DEFAULTS.HTML_FILE_PATH)
+    src_dir = os.path.join(project_dir, CONSTANTS.SRC_DIR)
 
-    config_file_path = os.path.join(project_dir, DEFAULTS.CONFIG_FILE_PATH)
+    src_static_dir = os.path.join(src_dir, CONSTANTS.STATIC_DIR)
+    html_file_path = os.path.join(src_dir, CONSTANTS.HTML_FILE_PATH)
+
+    config_file_path = os.path.join(project_dir, CONSTANTS.CONFIG_FILE_PATH)
     config_settings = {
-        "src_dir": DEFAULTS.SRC_DIR,
-        "dest_dir": DEFAULTS.DEST_DIR
+        "src_dir": CONSTANTS.SRC_DIR,
+        "dest_dir": CONSTANTS.DEST_DIR
     }
 
     # Create project directory
@@ -81,7 +83,7 @@ def create_project(project_name):
 
     # Initial setup of project/src directory
     package_path = os.path.dirname(sys.modules[__name__].__file__)
-    init_src_dir_path = os.path.join(package_path, DEFAULTS.INIT_FILES_DIR)
+    init_src_dir_path = os.path.join(package_path, CONSTANTS.INIT_FILES_DIR)
     copy_tree(init_src_dir_path, src_dir)
 
     # Create template config.json in project dir
@@ -93,7 +95,7 @@ def create_project(project_name):
 
     # Create react app
     npm = NodeWrapper(project_name, working_dir=project_dir)
-    npm.create_react_app(rename_to=DEFAULTS.DEST_DIR)
+    npm.create_react_app(rename_to=CONSTANTS.DEST_DIR)
 
     # Install NPM packages
     npm.install(package_name='react-helmet', working_dir=dist_dir)
@@ -105,7 +107,7 @@ def create_project(project_name):
                             dist_dir,
                             dist_src_dir,
                             dist_static_dir,
-                            parser=DEFAULTS.BS_PARSER,
+                            parser=CONSTANTS.BS_PARSER,
                             verbose=True)
     transpiler.transpile()
 
@@ -125,3 +127,7 @@ def watch(watch_dir):
 
     watcher = ReactoniteWatcher(watch_dir)
     watcher.start()
+
+
+if __name__ == "__main__":
+    pass

@@ -27,18 +27,8 @@ class Transpiler:
     verbose : bool, optional
         Default value : False
         Specify the verbosity of the transpiler
-
-    Methods
-    -------
-    __copyStaticFolderToBuild()
-        Copies source static folder to the transpiled React app
-    __transpileFile(filepath)
-        Translates the given file to React code
-    transpile()
-        Runs checks and calls __copyStaticFolderToBuild and
-        __transpileFile
-
     """
+
     def __init__(self,
                  src_dir,
                  html_file_path,

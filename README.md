@@ -92,7 +92,7 @@ $ pip install .
 
 ## Usage
 
-Once installed here are the commands that will allow you to create Reactonite projects.
+Once installed refer to the [documentation](https://reactonite.github.io/reactonite/) for the set of commands available with Reactonite cli or you can beign by typing
 
 ### `reactonite --help`
 
@@ -108,32 +108,7 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  create-project     Command for creating new Reactonite project from...
-  transpile-project  Command for transpiling a Reactonite project built...
-  watch              Command for watching for changes and initializing the...
-```
-
-### `reactonite create-project PROJECT_NAME`
-
-Creates a Reactonite project with required directory structure. Change `PROJECT_NAME` to your app name.
-
-```sh
-$ reactonite create-project my-new-project
-```
-
-### `reactonite transpile-project`
-
-Transpiles a Reactonite project created using create-project commandline. Requires config.json to be configured properly.
-
-Available options:
-
-- `--verbsose` or `-v` (bool): Verbosity of the command
-
-```sh
-# verbose false by default
-$ reactonite  transpile-project
-# or with verbose
-$ reactonite  transpile-project -v
+  ...
 ```
 
 <!-- ROADMAP -->

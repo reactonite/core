@@ -1,6 +1,9 @@
 <p align="center">
    <img src="https://user-images.githubusercontent.com/32339251/95760847-2265f880-0cc9-11eb-8cd5-ca641cea0771.png" alt="" width="160" />
    <h3 align="center">Reactonite</h3>
+   
+   <p align="center"><img src="https://github.com/SDOS2020/Team_3_Reactonite/workflows/Python%20Linter/badge.svg?branch=beta" /> <img src="https://img.shields.io/website?label=documentation&up_message=up&url=https%3A%2F%2Freactonite.github.io%2Freactonite%2F" /></p>
+
    <p align="center">
       A transpiler to convert HTML to React code and PWAs ✨
       </br>

@@ -92,7 +92,7 @@ $ pip install .
 
 ## Usage
 
-Once installed here are the commands that will allow you to create Reactonite projects.
+Once installed refer to the [documentation](https://reactonite.github.io/reactonite/) for the set of commands available with Reactonite cli or you can beign by typing
 
 ### `reactonite --help`
 
@@ -102,20 +102,13 @@ Opens the help page for `reactonite` commandline.
 $ reactonite --help
 Usage: reactonite [OPTIONS] COMMAND [ARGS]...
 
+  Entry point for Reactonite cli.
+
 Options:
   --help  Show this message and exit.
 
 Commands:
-  create-project
-  watch
-```
-
-### `reactonite create-project PROJECT_NAME`
-
-Creates a reactonite app project with required directory structure. Change `PROJECT_NAME` to your app name.
-
-```sh
-$ reactonite create-project my-new-project
+  ...
 ```
 
 <!-- ROADMAP -->

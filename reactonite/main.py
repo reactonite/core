@@ -127,7 +127,3 @@ def watch(watch_dir):
 
     watcher = ReactoniteWatcher(watch_dir)
     watcher.start()
-
-
-if __name__ == "__main__":
-    pass

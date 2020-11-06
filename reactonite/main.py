@@ -116,8 +116,8 @@ def transpile_project(verbose):
 
     Raises
     ------
-    File
-        If project name is invalid.
+    FileNotFoundError
+        If config.json file doesn't exist.
     """
 
     CONSTANTS = DEFAULTS()
@@ -136,17 +136,27 @@ def transpile_project(verbose):
 
 
 @cli.command()
-@click.argument('watch_dir')
-def watch(watch_dir):
-    """Command for watching for changes and initializing the watcher.
+def start():
+    """Command to start realtime development transpiler for Reactonite.
 
-    Starts watching for changes in the specified project directory.
+    Starts watching for changes in project directory and transpiles codebase.
 
-    Parameters
-    ----------
-    watch_dir : str
-        Path of directory to be watched for changes.
+    Raises
+    ------
+    FileNotFoundError
+        If config.json file doesn't exist.
     """
 
-    watcher = ReactoniteWatcher(watch_dir)
+    CONSTANTS = DEFAULTS()
+    config_file = CONSTANTS.CONFIG_FILE_NAME
+
+    if not os.path.exists(config_file):
+        raise FileNotFoundError(
+            "Reactonite config.json file doesn't exist, can't proceed."
+        )
+
+    with open(config_file) as infile:
+        config_settings = json.load(infile)
+
+    watcher = ReactoniteWatcher(config_settings)
     watcher.start()

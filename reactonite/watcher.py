@@ -1,3 +1,4 @@
+import os
 import time
 
 from watchdog.events import PatternMatchingEventHandler
@@ -10,35 +11,51 @@ class ReactoniteWatcher():
 
     Attributes
     ----------
-    dir : str
-        Path of the directory to watch and report for events.
+    src_dir : str
+        Path of the source direectory to watch and report for events.
+    dest_dir : str
+        Path of the destination direectory to write transpiled code.
+    config_settings : dict
+        Path to src_dir and dest_dir as dict object, stored in config.json
     patterns : str, optional
-        Default value = "*"
-        Pattern of files/directories to watch
+        Pattern of files/directories to watch, defaults to "*"
     ignore_patterns : str, optional
-        Default value = ""
-        Pattern of files/directories to ignore or not watch
+        Pattern of files/directories to ignore or not watch, defaults to ""
     ignore_directories : bool, optional
-        Default value = False
         Parameter whether the watcher should ignore directories or
-        not
+        not, defaults to False
     case sensitive : bool
-        Default value = True
         Parameter explaining whether file/directory names are
-        case-sensitive or not
+        case-sensitive or not, defaults to True
     recursive : bool
-        Default value = True
         Parameter whether the watcher should recursively watch
-        inside directories or not
+        inside directories or not, defaults to True
     """
+
     def __init__(self,
-                 dir,
+                 config_settings,
                  patterns="*",
                  ignore_patterns="",
                  ignore_directories=False,
                  case_sensitive=True,
                  recursive=True):
-        self.dir = dir
+
+        self.src_dir = config_settings["src_dir"]
+        self.dest_dir = config_settings["dest_dir"]
+        self.config_settings = config_settings
+
+        if not os.path.exists(os.path.join(".", self.src_dir)):
+            raise RuntimeError(
+                "Source directory doesn't exist at " +
+                str(self.src_dir)
+            )
+
+        if not os.path.exists(os.path.join(".", self.dest_dir)):
+            raise RuntimeError(
+                "Destination directory doesn't exist at " +
+                str(self.dest_dir)
+            )
+
         self.patterns = patterns
         self.ignore_patterns = ignore_patterns
         self.ignore_directories = ignore_directories
@@ -50,6 +67,7 @@ class ReactoniteWatcher():
         various events to different functions as per the
         requirement
         """
+
         event_handler = PatternMatchingEventHandler(self.patterns,
                                                     self.ignore_patterns,
                                                     self.ignore_directories,
@@ -59,14 +77,18 @@ class ReactoniteWatcher():
         event_handler.on_modified = self.__on_modified
         event_handler.on_moved = self.__on_moved
 
-        path = self.dir
         go_recursively = self.recursive
 
         observer = Observer()
-        observer.schedule(event_handler, path, recursive=go_recursively)
+        observer.schedule(
+            event_handler,
+            self.src_dir,
+            recursive=go_recursively
+        )
 
         observer.start()
-        print(f'Started Watchdog on path {self.dir}')
+        # TODO: Run NPM START
+        print(f'Started watching for changes on path {self.src_dir}')
         try:
             while True:
                 time.sleep(1)
@@ -83,6 +105,7 @@ class ReactoniteWatcher():
         event : obj
             An event object containing necessary details about it.
         """
+
         print(f"{event.src_path} has been created!")
 
     def __on_deleted(self, event):
@@ -94,6 +117,7 @@ class ReactoniteWatcher():
         event : obj
             An event object containing necessary details about it.
         """
+
         print(f"deleted {event.src_path}!")
 
     def __on_modified(self, event):
@@ -105,6 +129,7 @@ class ReactoniteWatcher():
         event : obj
             An event object containing necessary details about it.
         """
+
         print(f"{event.src_path} has been modified")
 
     def __on_moved(self, event):
@@ -116,4 +141,5 @@ class ReactoniteWatcher():
         event : obj
             An event object containing necessary details about it.
         """
+
         print(f"moved {event.src_path} to {event.dest_path}")

@@ -84,7 +84,7 @@ Opens the help page for ``reactonite`` commandline.
 
 .. code:: sh
 
-    $ reactonite --help
+    $ reactonite
     Usage: reactonite [OPTIONS] COMMAND [ARGS]...
 
     Entry point for Reactonite cli.
@@ -94,8 +94,8 @@ Opens the help page for ``reactonite`` commandline.
 
     Commands:
     create-project     Command for creating new Reactonite project from...
+    start              Command to start realtime development transpiler for...
     transpile-project  Command for transpiling a Reactonite project built...
-    watch              Command for watching for changes and initializing the...
 
 ``reactonite create-project PROJECT_NAME``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,6 +105,16 @@ Creates a Reactonite project with required directory structure. Change ``PROJECT
 .. code:: sh
 
     $ reactonite create-project my-new-project
+
+
+``reactonite start``
+~~~~~~~~~~~~~~~~~~~~
+
+Starts watching for changes in Reactonite project ``src`` directory and builds the same in realtime. Requires config.json to be configured properly.
+
+.. code:: sh
+
+    $ reactonite start
 
 
 ``reactonite transpile-project``

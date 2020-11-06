@@ -17,6 +17,9 @@ class NodeWrapper:
     def __init__(self,
                  app_name,
                  working_dir="."):
+
+        # TODO: Add docs for these and remove app_name and working_dir
+        # to create_react_app
         self.app_name = app_name
         self.working_dir = working_dir
 

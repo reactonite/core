@@ -11,52 +11,95 @@ class Transpiler:
     ----------
     src_dir : str
         Path of the source directory within the project directory
-    html_file_path : str
-        Path of the source HTML file within the source directory
-    src_static_dir : str
-        Path of the source static directory containing static files
-    dist_dir : str
+    dest_dir : str
         Path to the transpiled React app within the project directory
-    dist_src_dir : str
-        Path to the source directory of the transpiled React app
-    dist_static_dir : str
-        Path to the static directory used by the transpiled React app
     parser : str, optional
-        Default value : "html.parser"
-        Specify which parser to use for reading HTML files
+        Specify which parser to use for reading HTML files, defaults
+        to "html.parser"
     verbose : bool, optional
-        Default value : False
-        Specify the verbosity of the transpiler
+        Specify the verbosity of the transpiler, defaults to False
     """
 
     def __init__(self,
-                 src_dir,
-                 html_file_path,
-                 src_static_dir,
-                 dist_dir,
-                 dist_src_dir,
-                 dist_static_dir,
-                 parser="html.parser",
+                 config_settings,
                  verbose=False):
+        """Transpiler initiator takes config settings and unpacks variables.
 
-        self.src_dir = src_dir
-        self.html_file_path = html_file_path
-        self.src_static_dir = src_static_dir
-        self.dist_dir = dist_dir
-        self.dist_src_dir = dist_src_dir
-        self.dist_static_dir = dist_static_dir
-        self.parser = parser
-        self.verbose = verbose
+        Parameters
+        ----------
+        config_settings : dict
+            Path to src_dir and dest_dir as dict object, stored in config.json
+        verbose : bool, optional
+            Specify the verbosity of the transpiler, deafults to False
 
-    def __copyStaticFolderToBuild(self):
-        """Copies source static folder to the transpiled React code
+        Raises
+        ------
+        RuntimeError
+            Raised if the config_settings point to non existing dirs.
         """
 
-        if self.verbose:
-            print('Copying static folder to build directory')
+        self.src_dir = config_settings["src_dir"]
+        self.dest_dir = config_settings["dest_dir"]
 
-        # TODO: Handle permissions issue
-        copy_tree(self.src_static_dir, self.dist_static_dir)
+        if not os.path.exists(os.path.join(".", self.src_dir)):
+            raise RuntimeError(
+                "Source directory doesn't exist at " +
+                str(self.src_dir)
+            )
+
+        if not os.path.exists(os.path.join(".", self.dest_dir)):
+            raise RuntimeError(
+                "Destination directory doesn't exist at " +
+                str(self.dest_dir)
+            )
+
+        self.parser = "html.parser"
+        self.verbose = verbose
+
+    def __generateReactFileContent(self, soup, function_name):
+        """Generates React code from HTML soup object.
+
+        Parameters
+        ----------
+        soup : BeautifulSoup
+            bs4.BeautifulSoup with HTML code to be transpiled.
+        function_name : str
+            Function name to be used from filename without extension.
+        """
+
+        # TODO: Handle function_name
+        # TODO: Props and Tags
+
+        body_contents = [
+            x.encode('utf-8').decode("utf-8") for x in soup.body.contents[1:-1]
+        ]
+        body_str = "".join(body_contents)
+        react_function = "function " + function_name + "() {return (<>" + \
+            body_str + "</>);}"
+        return """
+        import React from 'react';
+        import Helmet from 'react-helmet';
+
+        {function}
+
+        export default App;
+        """.format(function=react_function)
+
+    def __copyStaticFolderToDest(self):
+        """Copies source static folder to the transpiled React code static
+        folder inside src
+        """
+
+        static_src_dir = os.path.join(self.src_dir, "static")
+        static_dest_dir = os.path.join(self.dest_dir, "src", "static")
+
+        if not os.path.exists(static_src_dir):
+            return
+
+        if self.verbose:
+            print('Copying static folder directory...')
+
+        copy_tree(static_src_dir, static_dest_dir)
 
     def __transpileFile(self, filepath, is_init_html=False):
         """Transpiles the source HTML file given at the given filepath
@@ -80,66 +123,57 @@ class Transpiler:
 
         _, filename = os.path.split(filepath)
         filenameWithNoExtension, file_extension = os.path.splitext(filename)
-        if is_init_html:
-            filename = "App.js"
-        else:
-            filename = filenameWithNoExtension + ".js"
 
         if file_extension != ".html":
             raise RuntimeError(str(filename) + ' is not a HTML file')
 
+        if is_init_html:
+            filenameWithNoExtension = "App"
+
+        filename = filenameWithNoExtension + ".js"
+
+        dest_filepath = os.path.join(self.dest_dir, 'src', filename)
+
         if self.verbose:
-            print("Transpiling file: " + filename)
+            print(
+                "Transpiling file " + str(filepath) +
+                " -> " + str(dest_filepath)
+            )
 
         with open(filepath, 'r') as index:
             soup = BeautifulSoup(index, self.parser)
 
-        with open(os.path.join(self.dist_src_dir, filename),
-                  'w') as outfile:
-            function = "function App() {return (<>" + \
-                        soup.html.prettify() + \
-                        "</>);}"
-            outfile.write(
-                """
-import React from 'react';
-
-{function}
-
-export default App;
-                """.format(function=function)
+        with open(dest_filepath, 'w') as outfile:
+            file_content = self.__generateReactFileContent(
+                soup,
+                filenameWithNoExtension
             )
+            outfile.write(file_content)
 
-    def transpile(self):
+    def transpile_project(self):
         """Runs initial checks like ensuring the source
         directories exist, and the source file is present.
-        After that, call __copyStaticFolderToBuild() and
-        __transpileFile methods to transpile the source.
+        After that, copies static files and transpiles the source.
 
         Raises
         ------
         RuntimeError
-            Raised if source directory or source html file
-            are missing
+            Raised source html file is missing.
         """
 
-        # Check if entry point folder exists
-        if os.path.isdir(self.src_dir):
-            # Check if entry point file exists
-            if os.path.isfile(self.html_file_path):
-                # Initial checks are done run code
-                pass
-            else:
-                raise RuntimeError("Entry point file doesn't exist at " +
-                                   str(self.html_file_path))
-        else:
-            raise RuntimeError("Entry point folder doesn't exist at " +
-                               str(self.src_dir))
+        entry_point_html = os.path.join(self.src_dir, 'index.html')
 
-        # Copy all static assets if exists
-        if(os.path.isdir(self.src_static_dir)):
-            self.__copyStaticFolderToBuild()
+        if not os.path.isfile(entry_point_html):
+            raise RuntimeError(
+                "Entry point file doesn't exist at " +
+                str(entry_point_html)
+            )
+
+        # Copy static assests
+        self.__copyStaticFolderToDest()
+
+        if self.verbose:
+            print("Transpiling files...")
 
         # TODO: Loop through all files/dirs in src folder except
-        # static(NAME_STATIC_FOLDER) dir
-        filepath = self.html_file_path
-        self.__transpileFile(filepath, is_init_html=True)
+        self.__transpileFile(entry_point_html, is_init_html=True)

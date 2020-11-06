@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 from distutils.dir_util import copy_tree
@@ -13,7 +14,7 @@ from .watcher import ReactoniteWatcher
 
 @click.group()
 def cli():
-    """Entry point for reactonite cli."""
+    """Entry point for Reactonite cli."""
 
     pass
 
@@ -21,7 +22,7 @@ def cli():
 @cli.command()
 @click.argument('project-name')
 def create_project(project_name):
-    """Command for creating new reactonite project from scratch.
+    """Command for creating new Reactonite project from scratch.
 
     Creates a new reactonite project with given PROJECT_NAME and installs npm
     packages along with basic directory structure layout.
@@ -36,6 +37,12 @@ def create_project(project_name):
     RuntimeError
         If project name is invalid.
     """
+
+    CONSTANTS = DEFAULTS()
+
+    project_dir = os.path.join(".", project_name)
+    dest_dir = os.path.join(project_dir, CONSTANTS.DEST_DIR)
+    src_dir = os.path.join(project_dir, CONSTANTS.SRC_DIR)
 
     # Valid project name checks
     if not project_name.islower():
@@ -52,8 +59,6 @@ def create_project(project_name):
             " only - is allowed as a special character."
         )
 
-    project_dir = os.path.join(".", project_name)
-
     if os.path.exists(project_dir):
         raise RuntimeError(
             "Invalid project name " +
@@ -61,18 +66,7 @@ def create_project(project_name):
             " directory already exists."
         )
 
-    CONSTANTS = DEFAULTS()
-
-    dist_dir = os.path.join(project_dir, CONSTANTS.DEST_DIR)
-    dist_src_dir = os.path.join(dist_dir, CONSTANTS.SRC_DIR)
-    dist_static_dir = os.path.join(dist_src_dir, CONSTANTS.STATIC_DIR)
-
-    src_dir = os.path.join(project_dir, CONSTANTS.SRC_DIR)
-
-    src_static_dir = os.path.join(src_dir, CONSTANTS.STATIC_DIR)
-    html_file_path = os.path.join(src_dir, CONSTANTS.HTML_FILE_PATH)
-
-    config_file_path = os.path.join(project_dir, CONSTANTS.CONFIG_FILE_PATH)
+    config_file_path = os.path.join(project_dir, CONSTANTS.CONFIG_FILE_NAME)
     config_settings = {
         "src_dir": CONSTANTS.SRC_DIR,
         "dest_dir": CONSTANTS.DEST_DIR
@@ -98,18 +92,47 @@ def create_project(project_name):
     npm.create_react_app(rename_to=CONSTANTS.DEST_DIR)
 
     # Install NPM packages
-    npm.install(package_name='react-helmet', working_dir=dist_dir)
+    npm.install(package_name='react-helmet', working_dir=dest_dir)
 
     # Transpile once
-    transpiler = Transpiler(src_dir,
-                            html_file_path,
-                            src_static_dir,
-                            dist_dir,
-                            dist_src_dir,
-                            dist_static_dir,
-                            parser=CONSTANTS.BS_PARSER,
-                            verbose=True)
-    transpiler.transpile()
+    transpiler = Transpiler({
+        "src_dir": src_dir,
+        "dest_dir": dest_dir
+    }, verbose=True)
+
+    transpiler.transpile_project()
+
+
+@cli.command()
+@click.option('--verbose', '-v', is_flag=True)
+def transpile_project(verbose):
+    """Command for transpiling a Reactonite project built using
+    create-project commandline.
+
+    Parameters
+    ----------
+    verbose : bool, optional
+        Verbosity of the command
+
+    Raises
+    ------
+    File
+        If project name is invalid.
+    """
+
+    CONSTANTS = DEFAULTS()
+    config_file = CONSTANTS.CONFIG_FILE_NAME
+
+    if not os.path.exists(config_file):
+        raise FileNotFoundError(
+            "Reactonite config.json file doesn't exist, can't proceed."
+        )
+
+    with open(config_file) as infile:
+        config_settings = json.load(infile)
+
+    transpiler = Transpiler(config_settings, verbose=verbose)
+    transpiler.transpile_project()
 
 
 @cli.command()

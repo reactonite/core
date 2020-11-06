@@ -102,20 +102,38 @@ Opens the help page for `reactonite` commandline.
 $ reactonite --help
 Usage: reactonite [OPTIONS] COMMAND [ARGS]...
 
+  Entry point for Reactonite cli.
+
 Options:
   --help  Show this message and exit.
 
 Commands:
-  create-project
-  watch
+  create-project     Command for creating new Reactonite project from...
+  transpile-project  Command for transpiling a Reactonite project built...
+  watch              Command for watching for changes and initializing the...
 ```
 
 ### `reactonite create-project PROJECT_NAME`
 
-Creates a reactonite app project with required directory structure. Change `PROJECT_NAME` to your app name.
+Creates a Reactonite project with required directory structure. Change `PROJECT_NAME` to your app name.
 
 ```sh
 $ reactonite create-project my-new-project
+```
+
+### `reactonite transpile-project`
+
+Transpiles a Reactonite project created using create-project commandline. Requires config.json to be configured properly.
+
+Available options:
+
+- `--verbsose` or `-v` (bool): Verbosity of the command
+
+```sh
+# verbose false by default
+$ reactonite  transpile-project
+# or with verbose
+$ reactonite  transpile-project -v
 ```
 
 <!-- ROADMAP -->

@@ -27,6 +27,13 @@ class NodeWrapper:
         self.app_name = app_name
         self.working_dir = working_dir
 
+        if os.name == "nt":
+            self.npx = "npx.cmd"
+            self.npm = "npm.cmd"
+        else:
+            self.npx = "npx"
+            self.npm = "npm"
+
     def create_react_app(self, rename_to=None):
         """Creates a new react app and renames it as specified.
 
@@ -37,8 +44,9 @@ class NodeWrapper:
             implies same as app name
         """
 
-        subprocess.run(["npx", "create-react-app", self.app_name, "--use-npm"],
-                       shell=True,
+        subprocess.run([self.npx, "create-react-app",
+                        self.app_name, "--use-npm"],
+                       shell=False,
                        cwd=self.working_dir)
 
         if rename_to is not None:
@@ -57,6 +65,6 @@ class NodeWrapper:
             Directory to execute the command in.
         """
 
-        subprocess.run(["npm", "i", package_name, "--save"],
-                       shell=True,
+        subprocess.run([self.npm, "i", package_name, "--save"],
+                       shell=False,
                        cwd=working_dir)

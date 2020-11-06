@@ -2,7 +2,7 @@ from pathlib import Path
 
 import setuptools
 
-from reactonite.version import __version__ as version
+from reactonite import __version__ as version
 
 REQUIREMENTS = Path("./requirements.txt").read_text()
 

@@ -12,13 +12,6 @@ class NodeWrapper:
     working_dir : str, optional
         Directory where the app needs to be generated,by default is "." which
         implies present working directory.
-
-    Methods
-    -------
-    create_react_app(rename_to=None)
-        Creates a new react app and renames it as specified.
-    install(package_name=None)
-        Installs the given package for npm.
     """
 
     def __init__(self,

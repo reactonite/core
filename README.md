@@ -4,9 +4,9 @@
    <p align="center">
       A transpiler to convert HTML to React code and PWAs ✨
       </br>
-      <a href="https://github.com/SDOS2020/Team_3_Reactonite/#table-of-contents"><strong>Explore the docs »</strong></a>
+      <a href="https://reactonite.github.io/reactonite/"><strong>Explore the Docs »</strong></a>
       <br/>
-      <a href="https://github.com/SDOS2020/Team_3_Reactonite/issues">Report Bug</a> . <a href="https://github.com/SDOS2020/Team_3_Reactonite/projects">View Project</a>
+      <a href="https://github.com/SDOS2020/Team_3_Reactonite/#table-of-contents">Table of Contents</a> . <a href="https://github.com/SDOS2020/Team_3_Reactonite/issues">Report Bug</a> . <a href="https://github.com/SDOS2020/Team_3_Reactonite/projects">View Project</a>
    </p>
 </p>
 

@@ -4,7 +4,7 @@ from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 
 
-class reactonite_watcher():
+class ReactoniteWatcher():
     """A file/directory watcher to report events incase
     they are modified/created/deleted.
 

@@ -2,7 +2,7 @@ import os
 import subprocess
 
 
-class node_wrapper:
+class NodeWrapper:
     """Node wrapper to execute commands corresponding to node js using python.
 
     Attributes

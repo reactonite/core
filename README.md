@@ -3,7 +3,7 @@
    <h3 align="center">Reactonite</h3>
    
    <p align="center"><img src="https://github.com/SDOS2020/Team_3_Reactonite/workflows/Python%20Linter/badge.svg?branch=beta" />
-   <a href="https://reactonite.github.io/reactonite/"><img src="https://img.shields.io/website?label=documentation&up_message=up&url=https%3A%2F%2Freactonite.github.io%2Freactonite%2F"/></p></a>
+   <a href="https://reactonite.github.io/reactonite/" target="_blank"><img src="https://img.shields.io/website?label=documentation&up_message=up&url=https%3A%2F%2Freactonite.github.io%2Freactonite%2F"/></p></a>
 
    <p align="center">
       A transpiler to convert HTML to React code and PWAs ✨

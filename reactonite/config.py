@@ -1,3 +1,6 @@
+from .props_map import props_map
+
+
 class DEFAULTS:
     """Default variables used in code execution
 
@@ -11,6 +14,8 @@ class DEFAULTS:
         Destination directory for React codebase.
     CONFIG_FILE_NAME : str
         Config file name for config variables.
+    PROPS_MAP : dict
+        Mapping for HTML to React props
     """
 
     def __init__(self):
@@ -18,3 +23,4 @@ class DEFAULTS:
         self.SRC_DIR = 'src'
         self.DEST_DIR = 'dist'
         self.CONFIG_FILE_NAME = 'config.json'
+        self.PROPS_MAP = props_map

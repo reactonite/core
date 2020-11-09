@@ -98,7 +98,10 @@ def create_project(project_name):
     transpiler = Transpiler({
         "src_dir": src_dir,
         "dest_dir": dest_dir
-    }, verbose=True)
+        },
+        props_map=CONSTANTS.PROPS_MAP,
+        verbose=True
+    )
 
     transpiler.transpile_project()
 
@@ -131,7 +134,11 @@ def transpile_project(verbose):
     with open(config_file) as infile:
         config_settings = json.load(infile)
 
-    transpiler = Transpiler(config_settings, verbose=verbose)
+    transpiler = Transpiler(
+        config_settings,
+        props_map=CONSTANTS.PROPS_MAP,
+        verbose=verbose
+    )
     transpiler.transpile_project()
 
 

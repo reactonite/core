@@ -34,7 +34,7 @@
 
 ## About The Project
 
-Reactonite is a wrapper for Eeact which allows one to write vanilla html code and convert it to a react code and hence building a PWA, SPA.
+Reactonite is a wrapper for React which allows one to write vanilla html code and convert it to a react code and hence building a PWA, SPA.
 
 Here's the key features added to Reactonite:
 

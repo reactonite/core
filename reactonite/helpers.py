@@ -1,6 +1,7 @@
 import json
 import os
 
+
 def get_parent_dir(path):
     """Returns location of the parent directory for a given path.
 
@@ -15,9 +16,10 @@ def get_parent_dir(path):
         Location of the parent directory
     """
     pdir = os.path.dirname(path)
-    if not pdir: 
+    if not pdir:
         pdir = '.'
     return pdir
+
 
 def create_dir(path):
     """Creates directory at the given path if it doesn't exist.
@@ -62,7 +64,10 @@ def create_file(path):
         if not os.path.isfile(path):
             raise RuntimeError('File can not be created at ' + str(path))
     else:
-        raise RuntimeError('Not enough permissions to create file at ' + str(pdir))
+        raise RuntimeError(
+            'Not enough permissions to create file at ' +
+            str(pdir)
+        )
 
 
 def write_to_json_file(path, content):

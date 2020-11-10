@@ -1,7 +1,46 @@
 import os
 from distutils.dir_util import copy_tree
+from html.parser import HTMLParser
 
 from bs4 import BeautifulSoup
+
+
+class AttributesParser(HTMLParser):
+    """Extends HTMLParser to extract tags with attributes from a given HTML string
+
+    Call feed method of HTMLParser to generate data and then retriece it from
+    the object of the class. Here's an usage example:
+
+    attributes_parser = AttributesParser()
+    attributes_parser.feed("YOUR_HTML_STRING")
+    tag_with_attributes = attributes_parser.data
+    print(tag_with_attributes)
+
+    Attributes
+    ----------
+    data : dict
+        Stores the tags with their attributes
+    """
+
+    def handle_starttag(self, tag, attrs):
+        """Overrides the original handler for start tag and appends the tags to data.
+
+        Parameters
+        ----------
+        tag : str
+            Name of tag being parsed
+        attrs : list
+            List of attrs corresponding to the current tag
+        """
+
+        try:
+            self.data.append({
+                tag: attrs
+            })
+        except AttributeError:
+            self.data = [{
+                tag: attrs
+            }]
 
 
 class Transpiler:
@@ -22,6 +61,7 @@ class Transpiler:
 
     def __init__(self,
                  config_settings,
+                 props_map,
                  verbose=False):
         """Transpiler initiator takes config settings and unpacks variables.
 
@@ -29,6 +69,8 @@ class Transpiler:
         ----------
         config_settings : dict
             Path to src_dir and dest_dir as dict object, stored in config.json
+        props_map : dict
+            Mapping of props for HTML to React used during transpilation
         verbose : bool, optional
             Specify the verbosity of the transpiler, deafults to False
 
@@ -40,6 +82,8 @@ class Transpiler:
 
         self.src_dir = config_settings["src_dir"]
         self.dest_dir = config_settings["dest_dir"]
+
+        self.props_map = props_map
 
         if not os.path.exists(os.path.join(".", self.src_dir)):
             raise RuntimeError(
@@ -67,12 +111,17 @@ class Transpiler:
             Function name to be used from filename without extension.
         """
 
-        # TODO: Handle function_name
-        # TODO: Props and Tags
+        attributes_parser = AttributesParser()
+        attributes_parser.feed(soup.prettify())
+        tag_with_attributes = attributes_parser.data
+
+        if self.verbose:
+            print(tag_with_attributes)
 
         body_contents = [
             x.encode('utf-8').decode("utf-8") for x in soup.body.contents[1:-1]
         ]
+
         body_str = "".join(body_contents)
         react_function = "function " + function_name + "() {return (<>" + \
             body_str + "</>);}"
@@ -175,5 +224,8 @@ class Transpiler:
         if self.verbose:
             print("Transpiling files...")
 
-        # TODO: Loop through all files/dirs in src folder except
-        self.__transpileFile(entry_point_html, is_init_html=True)
+        # TODO: Next Release, Loop through all files/dirs in src folder except
+        self.__transpileFile(
+            entry_point_html,
+            is_init_html=True
+        )

@@ -58,9 +58,14 @@ class ReactCodeMapper:
 
     Attributes
     ----------
-    IMAGE_TAG_HANDLER : str
-        Stores handler corresponding to img tag of HTML, defaults to
-        'IMAGE_TAG_HANDLER'
+    __IMAGE_TAG_HANDLER : str
+        Stores handler corresponding to img tag
+    __STYLE_TAG_HANDLER : str
+        Stores handler corresponding to style tag
+    __SCRIPT_TAG_HANDLER : str
+        Stores handler corresponding to script tag
+    __LINK_TAG_HANDLER : str
+        Stores handler corresponding to link tag
     CUSTOM_TAG_HANDLERS : dict
         Stores mapping correspoding to tags which are handled seperately.
     dest_dir : str
@@ -73,10 +78,16 @@ class ReactCodeMapper:
         Stores newly created variables during transpilation.
     """
 
-    IMAGE_TAG_HANDLER = 'IMAGE_TAG_HANDLER'
+    __IMAGE_TAG_HANDLER = 'IMAGE_TAG_HANDLER'
+    __STYLE_TAG_HANDLER = 'STYLE_TAG_HANDLER'
+    __SCRIPT_TAG_HANDLER = 'SCRIPT_TAG_HANDLER'
+    __LINK_TAG_HANDLER = 'LINK_TAG_HANDLER'
 
     CUSTOM_TAG_HANDLERS = {
-        'img': IMAGE_TAG_HANDLER
+        'img': __IMAGE_TAG_HANDLER,
+        'style': __STYLE_TAG_HANDLER,
+        'script': __SCRIPT_TAG_HANDLER,
+        'link': __LINK_TAG_HANDLER
     }
 
     def __init__(self, dest_dir, props_map):
@@ -137,6 +148,35 @@ class ReactCodeMapper:
         else:
             return link
 
+    def __getAttrsWithLink(self, attrs, linkAttr):
+        """Generates attrs for tags having links to other files.
+
+        If link is internal corresponding variable name is generated, for
+        external link it is returned.
+
+        Parameters
+        ----------
+        attrs : dict
+            Attributes of tag to be worked upon.
+        linkAttr : str
+            Name of attr that correspond to link of file, example 'src' in
+            case of script tag
+
+        Returns
+        -------
+        dict
+            Final dictonary of attributes with link handled
+        """
+
+        final_attrs = {}
+        for attrKey in attrs.keys():
+            if attrKey == linkAttr:
+                link_info = self.__getLinkInfo(attrs[attrKey])
+                final_attrs['src'] = link_info
+            else:
+                final_attrs[attrKey] = attrs[attrKey]
+        return final_attrs
+
     def __customTagAttrsHandler(self, attrs, tag_handler):
         """Custom tag and attributes handler for parsing attrs from CUSTOM_TAG_HANDLERS
 
@@ -150,17 +190,21 @@ class ReactCodeMapper:
         Returns
         -------
         dict
-            Final attributes for that tag
+            Final attributes for that tag, if None is returned delete the tag
         """
 
         final_attrs = {}
-        if tag_handler == self.IMAGE_TAG_HANDLER:
-            for attrKey in attrs.keys():
-                if attrKey == "src":
-                    link_info = self.__getLinkInfo(attrs[attrKey])
-                    final_attrs['src'] = link_info
-                else:
-                    final_attrs[attrKey] = attrs[attrKey]
+        if tag_handler == self.__IMAGE_TAG_HANDLER:
+            final_attrs = self.__getAttrsWithLink(attrs, 'src')
+        elif tag_handler == self.__STYLE_TAG_HANDLER:
+            print(attrs)
+        elif tag_handler == self.__SCRIPT_TAG_HANDLER:
+            if 'src' in attrs.keys():
+                final_attrs = self.__getAttrsWithLink(attrs, 'src')
+            else:
+                return None
+        elif tag_handler == self.__LINK_TAG_HANDLER:
+            final_attrs = self.__getAttrsWithLink(attrs, 'href')
         return final_attrs
 
     def __getRenamedAttrs(self, attrs):
@@ -198,7 +242,8 @@ class ReactCodeMapper:
         Returns
         -------
         dict
-            Final mapping of tags with imports and varibles for React
+            Final mapping of tags with imports and varibles for React, if any
+            attribute is None then tag needs to be deleted
         """
 
         final_map = {
@@ -209,7 +254,6 @@ class ReactCodeMapper:
         for tag in tags:
             tag_name = list(tag.keys())[0]
             attrs = self.__getRenamedAttrs(tag[tag_name])
-
             if tag_name in self.CUSTOM_TAG_HANDLERS:
                 attrs = self.__customTagAttrsHandler(
                     attrs,
@@ -295,8 +339,22 @@ class Transpiler:
 
         if or_attrs == f_attrs:
             return
-        el = soup.find(tag_name, attrs=or_attrs)
-        el.attrs = f_attrs
+        soup.find(tag_name, attrs=or_attrs).attrs = f_attrs
+
+    def __deleteTag(self, soup, tag_name, attrs):
+        """Deletes the tag corresponding to given tag_name and attrs.
+
+        Parameters
+        ----------
+        soup : BeautifulSoup
+            bs4.BeautifulSoup passed by reference.
+        tag_name : str
+            Name of tag being worked upon.
+        attrs : dict
+            Dictonary consisting of original attributes of HTML.
+        """
+
+        soup.find(tag_name, attrs=attrs).decompose()
 
     def __generateReactFileContent(self, soup, function_name):
         """Generates React code from HTML soup object.
@@ -331,27 +389,33 @@ class Transpiler:
             f_attrs = fianl_tag[f_tag_name]
 
             if or_tag_name == f_tag_name:
-                self.__replaceAttrs(soup, or_tag_name, or_attrs, f_attrs)
+                if f_attrs is None:
+                    self.__deleteTag(soup, or_tag_name, or_attrs)
+                else:
+                    self.__replaceAttrs(soup, or_tag_name, or_attrs, f_attrs)
             else:
                 raise RuntimeWarning(
                     "There's an error in processing " +
                     or_tag_name
                 )
 
+        soup.head.name = 'Helmet'
+
         body_contents = [
             x.encode('utf-8').decode("utf-8") for x in soup.body.contents[1:-1]
         ]
-
         body_str = "".join(body_contents)
 
+        content_str = soup.Helmet.prettify() + body_str
+
         for variable in react_variables:
-            body_str = body_str.replace(
+            content_str = content_str.replace(
                 '"{' + variable + '}"',
                 '{' + variable + '}'
             )
 
         react_function = "function " + function_name + "() {return (<>" + \
-            body_str + "</>);}"
+            content_str + "</>);}"
 
         return """
         import React from 'react';

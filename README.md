@@ -25,7 +25,6 @@
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Usage](#usage)
-  - [`reactonite --help`](#reactonite---help)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
@@ -35,7 +34,7 @@
 
 ## About The Project
 
-Reactonite is a free and open source wrapper for react which lets a person write vanilla html code and convert it to a react code easily, hence building a PWA, SPA.
+Reactonite is a wrapper for Eeact which allows one to write vanilla html code and convert it to a react code and hence building a PWA, SPA.
 
 Here's the key features added to Reactonite:
 
@@ -98,11 +97,7 @@ $ pip install .
 
 ## Usage
 
-Once installed refer to the [documentation](https://reactonite.github.io/reactonite/) for the set of commands available with Reactonite cli or you can beign by typing
-
-### `reactonite --help`
-
-Opens the help page for `reactonite` commandline.
+Once installed refer to the [documentation](https://reactonite.github.io/reactonite/) for the set of commands available with Reactonite cli or you can begin by typing `reactonite --help` which opens the help page for `reactonite` command line tool.
 
 ```sh
 $ reactonite --help

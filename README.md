@@ -2,7 +2,8 @@
    <img src="https://user-images.githubusercontent.com/32339251/95760847-2265f880-0cc9-11eb-8cd5-ca641cea0771.png" alt="" width="160" />
    <h3 align="center">Reactonite</h3>
    
-   <p align="center"><img src="https://github.com/SDOS2020/Team_3_Reactonite/workflows/Python%20Linter/badge.svg?branch=beta" /> <img src="https://img.shields.io/website?label=documentation&up_message=up&url=https%3A%2F%2Freactonite.github.io%2Freactonite%2F" /></p>
+   <p align="center"><img src="https://github.com/SDOS2020/Team_3_Reactonite/workflows/Python%20Linter/badge.svg?branch=beta" />
+   <a onclick="window.open(this.href,'_blank');return false;" href="https://reactonite.github.io/reactonite/"><img src="https://img.shields.io/website?label=documentation&up_message=up&url=https%3A%2F%2Freactonite.github.io%2Freactonite%2F"/></p></a>
 
    <p align="center">
       A transpiler to convert HTML to React code and PWAs ✨
@@ -17,7 +18,8 @@
 
 ## Table of Contents
 
-- [About the Project](#about-the-project)
+- [Table of Contents](#table-of-contents)
+- [About The Project](#about-the-project)
   - [Built With](#built-with)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
@@ -32,7 +34,7 @@
 
 ## About The Project
 
-Reactonite is a free and open source wrapper for react which lets a person write vanilla html code and convert it to a react code easily, hence building a PWA, SPA.
+Reactonite is a wrapper for Eeact which allows one to write vanilla html code and convert it to a react code and hence building a PWA, SPA.
 
 Here's the key features added to Reactonite:
 
@@ -95,11 +97,7 @@ $ pip install .
 
 ## Usage
 
-Once installed refer to the [documentation](https://reactonite.github.io/reactonite/) for the set of commands available with Reactonite cli or you can beign by typing
-
-### `reactonite --help`
-
-Opens the help page for `reactonite` commandline.
+Once installed refer to the [documentation](https://reactonite.github.io/reactonite/) for the set of commands available with Reactonite cli or you can begin by typing `reactonite --help` which opens the help page for `reactonite` command line tool.
 
 ```sh
 $ reactonite --help

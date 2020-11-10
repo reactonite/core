@@ -43,20 +43,22 @@ software.
 Installation
 ------------
 
-1. Setup virtual environment?
-
-.. code:: sh
-
-    $ virtualenv venv
-
-> Not necessary but recommended to keep your environment clean.
-> Dont forget to activate it.
-
-2. Clone the repository to local machine.
+1. Clone the reactonite repository to local machine.
 
 .. code:: sh
 
     $ git clone https://github.com/SDOS2020/Team_3_Reactonite.git
+
+1. Setup virtual environment?
+
+.. code:: sh
+
+    $ cd Team_3_Reactonite
+    $ python -m venv env
+    $ env\Scripts\activate    # For Windows
+    $ source env/bin/activate # For Linux
+
+> Not necessary but recommended to keep your environment clean.
 
 3. Install the package either using pip or python setup tools
 

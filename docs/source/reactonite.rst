@@ -36,6 +36,14 @@ reactonite.node\_wrapper module
    :undoc-members:
    :show-inheritance:
 
+reactonite.props\_map module
+----------------------------
+
+.. automodule:: reactonite.props_map
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 reactonite.transpiler module
 ----------------------------
 

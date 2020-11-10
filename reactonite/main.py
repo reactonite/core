@@ -5,11 +5,11 @@ from distutils.dir_util import copy_tree
 
 import click
 
-from .config import DEFAULTS
-from .helpers import create_dir, create_file, write_to_json_file
-from .node_wrapper import NodeWrapper
-from .transpiler import Transpiler
-from .watcher import ReactoniteWatcher
+from .Constants import DEFAULTS
+from .Helpers import create_dir, create_file, write_to_json_file
+from .NodeWrapper import NodeWrapper
+from .ReactoniteWatcher import ReactoniteWatcher
+from .Transpiler import Transpiler
 
 
 @click.group()

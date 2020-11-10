@@ -58,14 +58,6 @@ class ReactCodeMapper:
 
     Attributes
     ----------
-    __IMAGE_TAG_HANDLER : str
-        Stores handler corresponding to img tag
-    __STYLE_TAG_HANDLER : str
-        Stores handler corresponding to style tag
-    __SCRIPT_TAG_HANDLER : str
-        Stores handler corresponding to script tag
-    __LINK_TAG_HANDLER : str
-        Stores handler corresponding to link tag
     CUSTOM_TAG_HANDLERS : dict
         Stores mapping correspoding to tags which are handled seperately.
     dest_dir : str
@@ -78,23 +70,23 @@ class ReactCodeMapper:
         Stores newly created variables during transpilation.
     """
 
-    __IMAGE_TAG_HANDLER = 'IMAGE_TAG_HANDLER'
-    __STYLE_TAG_HANDLER = 'STYLE_TAG_HANDLER'
-    __SCRIPT_TAG_HANDLER = 'SCRIPT_TAG_HANDLER'
-    __LINK_TAG_HANDLER = 'LINK_TAG_HANDLER'
-
-    CUSTOM_TAG_HANDLERS = {
-        'img': __IMAGE_TAG_HANDLER,
-        'style': __STYLE_TAG_HANDLER,
-        'script': __SCRIPT_TAG_HANDLER,
-        'link': __LINK_TAG_HANDLER
-    }
-
     def __init__(self, dest_dir, props_map):
         self.dest_dir = dest_dir
         self.props_map = props_map
         self.add_to_import = []
         self.add_variables = []
+
+        self.__IMAGE_TAG_HANDLER = 'IMAGE_TAG_HANDLER'
+        self.__STYLE_TAG_HANDLER = 'STYLE_TAG_HANDLER'
+        self.__SCRIPT_TAG_HANDLER = 'SCRIPT_TAG_HANDLER'
+        self.__LINK_TAG_HANDLER = 'LINK_TAG_HANDLER'
+
+        self.CUSTOM_TAG_HANDLERS = {
+            'img': self.__IMAGE_TAG_HANDLER,
+            'style': self.__STYLE_TAG_HANDLER,
+            'script': self.__SCRIPT_TAG_HANDLER,
+            'link': self.__LINK_TAG_HANDLER
+        }
 
     def __getSafeName(self, link):
         """Generates safe name for varibale from path to file.

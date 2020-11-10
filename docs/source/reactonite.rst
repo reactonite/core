@@ -4,18 +4,50 @@ reactonite package
 Submodules
 ----------
 
-reactonite.config module
-------------------------
+reactonite.Constants module
+---------------------------
 
-.. automodule:: reactonite.config
+.. automodule:: reactonite.Constants
    :members:
    :undoc-members:
    :show-inheritance:
 
-reactonite.helpers module
+reactonite.Helpers module
 -------------------------
 
-.. automodule:: reactonite.helpers
+.. automodule:: reactonite.Helpers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+reactonite.NodeWrapper module
+-----------------------------
+
+.. automodule:: reactonite.NodeWrapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+reactonite.PropsMap module
+--------------------------
+
+.. automodule:: reactonite.PropsMap
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+reactonite.ReactoniteWatcher module
+-----------------------------------
+
+.. automodule:: reactonite.ReactoniteWatcher
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+reactonite.Transpiler module
+----------------------------
+
+.. automodule:: reactonite.Transpiler
    :members:
    :undoc-members:
    :show-inheritance:
@@ -24,38 +56,6 @@ reactonite.main module
 ----------------------
 
 .. automodule:: reactonite.main
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-reactonite.node\_wrapper module
--------------------------------
-
-.. automodule:: reactonite.node_wrapper
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-reactonite.props\_map module
-----------------------------
-
-.. automodule:: reactonite.props_map
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-reactonite.transpiler module
-----------------------------
-
-.. automodule:: reactonite.transpiler
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-reactonite.watcher module
--------------------------
-
-.. automodule:: reactonite.watcher
    :members:
    :undoc-members:
    :show-inheritance:

@@ -18,7 +18,7 @@ class AttributesParser(HTMLParser):
 
     Attributes
     ----------
-    data : dict
+    data : list
         Stores the tags with their attributes
     """
 
@@ -33,14 +33,192 @@ class AttributesParser(HTMLParser):
             List of attrs corresponding to the current tag
         """
 
+        attrDict = {}
+        for attr in attrs:
+            attrDict[attr[0]] = attr[1]
         try:
             self.data.append({
-                tag: attrs
+                tag: attrDict
             })
         except AttributeError:
             self.data = [{
-                tag: attrs
+                tag: attrDict
             }]
+
+
+class ReactCodeMapper:
+    """Class to convert tags and props from HTML to React
+
+    Call getReactMap method for converting tags fed for HTML and get
+    corresponding React Mapping. Here's an usage example:
+
+    reactCodeMapper = ReactCodeMapper(destination_dir, props_map)
+    react_map = reactCodeMapper.getReactMap(tag_with_attributes)
+    print(react_map)
+
+    Attributes
+    ----------
+    IMAGE_TAG_HANDLER : str
+        Stores handler corresponding to img tag of HTML, defaults to
+        'IMAGE_TAG_HANDLER'
+    CUSTOM_TAG_HANDLERS : dict
+        Stores mapping correspoding to tags which are handled seperately.
+    dest_dir : str
+        Destination directory for the React codebase.
+    props_map : dict
+        Mapping of attrs for HTML to React from props_map.py
+    add_to_import : list
+        Stores imports corresponding to variables created during transpilation.
+    add_variables : list
+        Stores newly created variables during transpilation.
+    """
+
+    IMAGE_TAG_HANDLER = 'IMAGE_TAG_HANDLER'
+
+    CUSTOM_TAG_HANDLERS = {
+        'img': IMAGE_TAG_HANDLER
+    }
+
+    def __init__(self, dest_dir, props_map):
+        self.dest_dir = dest_dir
+        self.props_map = props_map
+        self.add_to_import = []
+        self.add_variables = []
+
+    def __getSafeName(self, link):
+        """Generates safe name for varibale from path to file.
+
+        Parameters
+        ----------
+        link : str
+            Path to file for which varibale is created.
+
+        Returns
+        -------
+        str
+            Variable name generated from link
+        """
+
+        varName = ""
+        for ch in link:
+            _ch = ch
+            if not ch.isalnum():
+                _ch = '_'
+            varName += _ch
+        return varName
+
+    def __getLinkInfo(self, link):
+        """Generates link information.
+
+        If link is internal corresponding variable name is generated, for
+        external link it is returned.
+
+        Parameters
+        ----------
+        link : str
+            Link for filepath or external link.
+
+        Returns
+        -------
+        str
+            Variable name generated from link or link in external case.
+        """
+
+        if os.path.exists(os.path.join(self.dest_dir, 'src', link)):
+            var = self.__getSafeName(link)
+            self.add_to_import.append(
+                "import {var} from '{link}';".format(
+                    var=var,
+                    link=link
+                )
+            )
+            self.add_variables.append(var)
+            return "{" + var + "}"
+        else:
+            return link
+
+    def __customTagAttrsHandler(self, attrs, tag_handler):
+        """Custom tag and attributes handler for parsing attrs from CUSTOM_TAG_HANDLERS
+
+        Parameters
+        ----------
+        attrs : dict
+            Attributes for corresponding tag needed to be handled
+        tag_handler : str
+            Tag handler type to be used in mapping
+
+        Returns
+        -------
+        dict
+            Final attributes for that tag
+        """
+
+        final_attrs = {}
+        if tag_handler == self.IMAGE_TAG_HANDLER:
+            for attrKey in attrs.keys():
+                if attrKey == "src":
+                    link_info = self.__getLinkInfo(attrs[attrKey])
+                    final_attrs['src'] = link_info
+                else:
+                    final_attrs[attrKey] = attrs[attrKey]
+        return final_attrs
+
+    def __getRenamedAttrs(self, attrs):
+        """Generates renamed attributes correspoding to React.
+
+        Parameters
+        ----------
+        attrs : dict
+            Attributes in HTML format
+
+        Returns
+        -------
+        dict
+            Attributes in React format
+        """
+
+        final_attrs = {}
+        for attrKey in attrs.keys():
+            if attrKey in self.props_map:
+                useKey = self.props_map[attrKey]
+            else:
+                useKey = attrKey
+            final_attrs[useKey] = attrs[attrKey]
+        return final_attrs
+
+    def getReactMap(self, tags):
+        """Wrapper to generate React Map object comprising of all data needed
+        to convert HTML to React
+
+        Parameters
+        ----------
+        tags : dict
+            HTML attributes extracted using AttributesParser
+
+        Returns
+        -------
+        dict
+            Final mapping of tags with imports and varibles for React
+        """
+
+        final_map = {
+            'imports': [],
+            'tags': [],
+            'variables': [],
+        }
+        for tag in tags:
+            tag_name = list(tag.keys())[0]
+            attrs = self.__getRenamedAttrs(tag[tag_name])
+
+            if tag_name in self.CUSTOM_TAG_HANDLERS:
+                attrs = self.__customTagAttrsHandler(
+                    attrs,
+                    self.CUSTOM_TAG_HANDLERS[tag_name]
+                )
+            final_map['tags'].append({tag_name: attrs})
+        final_map['imports'] = "\n".join(self.add_to_import)
+        final_map['variables'] = self.add_variables
+        return final_map
 
 
 class Transpiler:
@@ -100,6 +278,26 @@ class Transpiler:
         self.parser = "html.parser"
         self.verbose = verbose
 
+    def __replaceAttrs(self, soup, tag_name, or_attrs, f_attrs):
+        """Replaces the attrs for updated tags comparing original and final attrs.
+
+        Parameters
+        ----------
+        soup : BeautifulSoup
+            bs4.BeautifulSoup passed by reference.
+        tag_name : str
+            Name of tag being worked upon.
+        or_attrs : dict
+            Dictonary consisting of original attributes of HTML.
+        f_attrs : dict
+            Dictonary consisting of final attributes for React.
+        """
+
+        if or_attrs == f_attrs:
+            return
+        el = soup.find(tag_name, attrs=or_attrs)
+        el.attrs = f_attrs
+
     def __generateReactFileContent(self, soup, function_name):
         """Generates React code from HTML soup object.
 
@@ -109,30 +307,61 @@ class Transpiler:
             bs4.BeautifulSoup with HTML code to be transpiled.
         function_name : str
             Function name to be used from filename without extension.
+
+        Returns
+        -------
+        str
+            Content for React file.
         """
 
         attributes_parser = AttributesParser()
         attributes_parser.feed(soup.prettify())
         tag_with_attributes = attributes_parser.data
 
-        if self.verbose:
-            print(tag_with_attributes)
+        reactCodeMapper = ReactCodeMapper(self.dest_dir, self.props_map)
+        react_map = reactCodeMapper.getReactMap(tag_with_attributes)
+
+        final_tags = react_map['tags']
+        react_variables = react_map['variables']
+
+        for orignal_tag, fianl_tag in zip(tag_with_attributes, final_tags):
+            or_tag_name = list(orignal_tag.keys())[0]
+            or_attrs = orignal_tag[or_tag_name]
+            f_tag_name = list(fianl_tag.keys())[0]
+            f_attrs = fianl_tag[f_tag_name]
+
+            if or_tag_name == f_tag_name:
+                self.__replaceAttrs(soup, or_tag_name, or_attrs, f_attrs)
+            else:
+                raise RuntimeWarning(
+                    "There's an error in processing " +
+                    or_tag_name
+                )
 
         body_contents = [
             x.encode('utf-8').decode("utf-8") for x in soup.body.contents[1:-1]
         ]
 
         body_str = "".join(body_contents)
+
+        for variable in react_variables:
+            body_str = body_str.replace(
+                '"{' + variable + '}"',
+                '{' + variable + '}'
+            )
+
         react_function = "function " + function_name + "() {return (<>" + \
             body_str + "</>);}"
+
         return """
         import React from 'react';
         import Helmet from 'react-helmet';
+        {imports}
 
         {function}
 
         export default App;
-        """.format(function=react_function)
+        """.format(function=react_function, imports=react_map['imports'])
 
     def __copyStaticFolderToDest(self):
         """Copies source static folder to the transpiled React code static

@@ -12,7 +12,7 @@ def get_parent_dir(path):
 
     Returns
     -------
-    pdir : str
+    str
         Location of the parent directory
     """
     pdir = os.path.dirname(path)

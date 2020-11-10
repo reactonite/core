@@ -1,4 +1,4 @@
-from .props_map import props_map
+from .PropsMap import props_map
 
 
 class DEFAULTS:

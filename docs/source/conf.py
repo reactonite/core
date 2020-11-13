@@ -22,8 +22,10 @@ project = 'Reactonite'
 copyright = '2020, Reactonite'
 author = 'Reactonite'
 
+version = '0.0.1-alpha'
+
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = version
 
 
 # -- General configuration ---------------------------------------------------

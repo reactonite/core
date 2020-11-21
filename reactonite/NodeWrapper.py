@@ -89,10 +89,14 @@ class NodeWrapper:
                        shell=False,
                        cwd=self.working_dir)
 
+        # Update working_dir to npm project root
         if rename_to is not None:
             src = os.path.join(self.working_dir, self.app_name)
             dest = os.path.join(self.working_dir, rename_to)
             os.rename(src, dest)
+            self.working_dir = os.path.join(self.working_dir, rename_to)
+        else:
+            self.working_dir = os.path.join(self.working_dir, self.app_name)
 
     def install(self, package_name=None, working_dir=None):
         """Installs the given package in npm and saves in package.json
@@ -102,8 +106,11 @@ class NodeWrapper:
         package_name : str
             Package to be installed.
         working_dir : str
-            Directory to execute the command in.
+            Directory containing npm project root
         """
+
+        if working_dir is None:
+            working_dir = self.working_dir
 
         subprocess.run([self.npm, "i", package_name, "--save"],
                        shell=False,
@@ -117,6 +124,9 @@ class NodeWrapper:
         working_dir : str
             Directory to execute the command in.
         """
+
+        if working_dir is None:
+            working_dir = self.working_dir
 
         subprocess.run([self.npm, "start"],
                        shell=False,

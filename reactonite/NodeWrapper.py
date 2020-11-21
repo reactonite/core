@@ -131,3 +131,19 @@ class NodeWrapper:
         subprocess.run([self.npm, "start"],
                        shell=False,
                        cwd=working_dir)
+
+    def build(self, working_dir=None):
+        """Create an optimized build of your app in the build folder
+
+        Parameters
+        ----------
+        working_dir : str
+            Directory containing npm project root
+        """
+
+        if working_dir is None:
+            working_dir = self.working_dir
+
+        subprocess.run([self.npm, "run", "build"],
+                       shell=False,
+                       cwd=working_dir)

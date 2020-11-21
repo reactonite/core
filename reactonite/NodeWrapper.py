@@ -15,7 +15,7 @@ class NodeWrapper:
     """
 
     def __init__(self,
-                 app_name,
+                 app_name="",
                  working_dir="."):
 
         # TODO: Add docs for these and remove app_name and working_dir
@@ -106,5 +106,18 @@ class NodeWrapper:
         """
 
         subprocess.run([self.npm, "i", package_name, "--save"],
+                       shell=False,
+                       cwd=working_dir)
+
+    def start(self, working_dir=None):
+        """Runs the command npm start in the given working directory
+
+        Parameters
+        ----------
+        working_dir : str
+            Directory to execute the command in.
+        """
+
+        subprocess.run([self.npm, "start"],
                        shell=False,
                        cwd=working_dir)

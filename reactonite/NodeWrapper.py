@@ -26,7 +26,7 @@ class NodeWrapper:
         if os.name == "nt":
             self.npx = "npx.cmd"
             self.npm = "npm.cmd"
-            self.node = "node.cmd"
+            self.node = "node.exe"
         else:
             self.npx = "npx"
             self.npm = "npm"

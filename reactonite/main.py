@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from distutils.dir_util import copy_tree
+import _thread
 
 import click
 
@@ -165,5 +166,13 @@ def start():
     with open(config_file) as infile:
         config_settings = json.load(infile)
 
+    dest_dir = config_settings["dest_dir"]
+
+    npm = NodeWrapper()
     watcher = ReactoniteWatcher(config_settings)
+
+    try:
+        _thread.start_new_thread(npm.start, (os.path.join(".", dest_dir),))
+    except:
+        print("Error: unable to start thread")
     watcher.start()

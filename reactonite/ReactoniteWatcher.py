@@ -87,7 +87,7 @@ class ReactoniteWatcher():
         )
 
         observer.start()
-        # TODO: Run NPM START
+
         print(f'Started watching for changes on path {self.src_dir}')
         try:
             while True:

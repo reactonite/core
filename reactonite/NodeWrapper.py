@@ -46,28 +46,28 @@ class NodeWrapper:
         """
 
         try:
-            npx_version = subprocess.run([self.npx, "--version"],
-                                         shell=False,
-                                         cwd=self.working_dir,
-                                         stdout=subprocess.DEVNULL)
+            subprocess.run([self.npx, "--version"],
+                           shell=False,
+                           cwd=self.working_dir,
+                           stdout=subprocess.DEVNULL)
         except Exception:
             print("npx not found. Please install/reinstall node")
             exit(1)
 
         try:
-            npm_version = subprocess.run([self.npm, "--version"],
-                                         shell=False,
-                                         cwd=self.working_dir,
-                                         stdout=subprocess.DEVNULL)
+            subprocess.run([self.npm, "--version"],
+                           shell=False,
+                           cwd=self.working_dir,
+                           stdout=subprocess.DEVNULL)
         except Exception:
             print("npm not found. Please install/reinstall node")
             exit(1)
 
         try:
-            node_version = subprocess.run([self.node, "--version"],
-                                          shell=False,
-                                          cwd=self.working_dir,
-                                          stdout=subprocess.DEVNULL)
+            subprocess.run([self.node, "--version"],
+                           shell=False,
+                           cwd=self.working_dir,
+                           stdout=subprocess.DEVNULL)
         except Exception:
             print("nodejs not found. Please install/reinstall node")
             exit(1)

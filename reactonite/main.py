@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 from distutils.dir_util import copy_tree
@@ -7,10 +6,11 @@ import _thread
 import click
 
 from .Constants import DEFAULTS
-from .Helpers import create_dir, create_file, write_to_json_file
+from .Helpers import create_dir
 from .NodeWrapper import NodeWrapper
 from .ReactoniteWatcher import ReactoniteWatcher
 from .Transpiler import Transpiler
+from .Config import Config
 
 
 @click.group()
@@ -68,10 +68,10 @@ def create_project(project_name):
         )
 
     config_file_path = os.path.join(project_dir, CONSTANTS.CONFIG_FILE_NAME)
-    config_settings = {
-        "src_dir": CONSTANTS.SRC_DIR,
-        "dest_dir": CONSTANTS.DEST_DIR
-    }
+    config_settings = Config(config_file_path)
+    config_settings.add_to_config("src_dir", CONSTANTS.SRC_DIR)
+    config_settings.add_to_config("dest_dir", CONSTANTS.DEST_DIR)
+    config_settings.add_to_config("project_name", project_name)
 
     # Create project directory
     create_dir(project_dir)
@@ -82,11 +82,7 @@ def create_project(project_name):
     copy_tree(init_src_dir_path, src_dir)
 
     # Create template config.json in project dir
-    create_file(config_file_path)
-    write_to_json_file(
-        config_file_path,
-        content=config_settings
-    )
+    config_settings.save_config()
 
     # Create react app
     npm = NodeWrapper(project_name, working_dir=project_dir)
@@ -126,17 +122,10 @@ def transpile_project(verbose):
 
     CONSTANTS = DEFAULTS()
     config_file = CONSTANTS.CONFIG_FILE_NAME
-
-    if not os.path.exists(config_file):
-        raise FileNotFoundError(
-            "Reactonite config.json file doesn't exist, can't proceed."
-        )
-
-    with open(config_file) as infile:
-        config_settings = json.load(infile)
+    config_settings = Config(config_file, load=True)
 
     transpiler = Transpiler(
-        config_settings,
+        config_settings.get_config(),
         props_map=CONSTANTS.PROPS_MAP,
         verbose=verbose
     )
@@ -157,22 +146,41 @@ def start():
 
     CONSTANTS = DEFAULTS()
     config_file = CONSTANTS.CONFIG_FILE_NAME
+    config_settings = Config(config_file, load=True)
 
-    if not os.path.exists(config_file):
-        raise FileNotFoundError(
-            "Reactonite config.json file doesn't exist, can't proceed."
-        )
-
-    with open(config_file) as infile:
-        config_settings = json.load(infile)
-
-    dest_dir = config_settings["dest_dir"]
+    dest_dir = config_settings.get("dest_dir")
 
     npm = NodeWrapper()
-    watcher = ReactoniteWatcher(config_settings)
+    watcher = ReactoniteWatcher(config_settings.get_config())
 
     try:
         _thread.start_new_thread(npm.start, (os.path.join(".", dest_dir),))
-    except:
+    except Exception:
         print("Error: unable to start thread")
     watcher.start()
+
+
+@cli.command()
+def build():
+    """Command to start realtime development transpiler for Reactonite.
+
+    Starts watching for changes in project directory and transpiles codebase.
+
+    Raises
+    ------
+    FileNotFoundError
+        If config.json file doesn't exist.
+    """
+
+    CONSTANTS = DEFAULTS()
+    config_file = CONSTANTS.CONFIG_FILE_NAME
+    config_settings = Config(config_file, load=True)
+
+    npm = NodeWrapper(config_settings.get("project_name"),
+                      working_dir=config_settings.get("dest_dir"))
+    npm.build()
+
+    # Move build folder to project_dir instead of dest_dir
+    npm_build = os.path.join(config_settings.get("dest_dir"), "build")
+    project_build = os.path.join(".", "build")
+    os.rename(npm_build, project_build)

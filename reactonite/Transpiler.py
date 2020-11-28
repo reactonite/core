@@ -1,8 +1,22 @@
 import os
+import re
 from distutils.dir_util import copy_tree
 from html.parser import HTMLParser
 
 from bs4 import BeautifulSoup
+from reactonite.Helpers import create_dir
+
+
+# Patch soup.prettify to use 4 spaces
+orig_prettify = BeautifulSoup.prettify
+r = re.compile(r'^(\s*)', re.MULTILINE)
+
+
+def prettify(self, encoding=None, formatter="minimal", indent_width=4):
+    return r.sub(r'\1' * indent_width, orig_prettify(self, encoding, formatter))
+
+
+BeautifulSoup.prettify = prettify
 
 
 class AttributesParser(HTMLParser):
@@ -394,11 +408,12 @@ class Transpiler:
         soup.head.name = 'Helmet'
 
         body_contents = [
-            x.encode('utf-8').decode("utf-8") for x in soup.body.contents[1:-1]
+            x.encode('utf-8').decode("utf-8").strip() for x in soup.body.contents
         ]
         body_str = "".join(body_contents)
+        body_soup = BeautifulSoup(body_str, self.parser)
 
-        content_str = soup.Helmet.prettify() + body_str
+        content_str = soup.Helmet.prettify() + body_soup.prettify()
 
         for variable in react_variables:
             content_str = content_str.replace(
@@ -409,17 +424,16 @@ class Transpiler:
         react_function = "function " + function_name + "() {return (<>" + \
             content_str + "</>);}"
 
-        return """
-        import React from 'react';
-        import Helmet from 'react-helmet';
-        {imports}
+        return """import React from 'react';
+import Helmet from 'react-helmet';
+{imports}
 
-        {function}
+{function}
 
-        export default App;
-        """.format(function=react_function, imports=react_map['imports'])
+export default App;
+""".format(function=react_function, imports=react_map['imports'])
 
-    def __copyStaticFolderToDest(self):
+    def copyStaticFolderToDest(self):
         """Copies source static folder to the transpiled React code static
         folder inside src
         """
@@ -435,7 +449,7 @@ class Transpiler:
 
         copy_tree(static_src_dir, static_dest_dir)
 
-    def __transpileFile(self, filepath, is_init_html=False):
+    def transpileFile(self, filepath, is_init_html=False):
         """Transpiles the source HTML file given at the given filepath
         to a React code, which is then copied over to the React build
         directory
@@ -453,6 +467,12 @@ class Transpiler:
         RuntimeError
             Raised if the source html file doesn't have a .html
             extention
+        RuntimeError
+            Raised if the source html file is not found
+        RuntimeError
+            Raised if the source html file is missing a head tag
+        RuntimeError
+            Raised if the source html file is missing a body tag
         """
 
         _, filename = os.path.split(filepath)
@@ -461,11 +481,16 @@ class Transpiler:
         if file_extension != ".html":
             raise RuntimeError(str(filename) + ' is not a HTML file')
 
+        if not os.path.isfile(filepath):
+            raise RuntimeError("{} file not found".format(filepath))
+
         if is_init_html:
             filenameWithNoExtension = "App"
 
         filename = filenameWithNoExtension + ".js"
 
+        if not os.path.isdir(os.path.join(self.dest_dir, 'src')):
+            create_dir(os.path.join(self.dest_dir, 'src'))
         dest_filepath = os.path.join(self.dest_dir, 'src', filename)
 
         if self.verbose:
@@ -476,6 +501,11 @@ class Transpiler:
 
         with open(filepath, 'r') as index:
             soup = BeautifulSoup(index, self.parser)
+
+        if soup.head is None:
+            raise RuntimeError("head tag missing from HTML file")
+        if soup.body is None:
+            raise RuntimeError("body tag missing from HTML file")
 
         with open(dest_filepath, 'w') as outfile:
             file_content = self.__generateReactFileContent(
@@ -504,13 +534,13 @@ class Transpiler:
             )
 
         # Copy static assests
-        self.__copyStaticFolderToDest()
+        self.copyStaticFolderToDest()
 
         if self.verbose:
             print("Transpiling files...")
 
         # TODO: Next Release, Loop through all files/dirs in src folder except
-        self.__transpileFile(
+        self.transpileFile(
             entry_point_html,
             is_init_html=True
         )

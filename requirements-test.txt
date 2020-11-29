@@ -15,7 +15,6 @@ pyflakes==2.2.0
 pyparsing==2.4.7
 pytest==6.1.2
 pytest-sugar==0.9.4
-reactonite==0.0.1a0
 soupsieve==2.0.1
 termcolor==1.1.0
 toml==0.10.2

@@ -523,6 +523,8 @@ class Transpiler:
             )
             outfile.write(file_content)
 
+        NodeWrapper().prettify(path=dest_filepath)
+
     def transpile_project(self):
         """Runs initial checks like ensuring the source
         directories exist, and the source file is present.

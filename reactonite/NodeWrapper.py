@@ -127,3 +127,18 @@ class NodeWrapper:
         subprocess.run([self.npm, "run", "build"],
                        shell=False,
                        cwd=working_dir)
+
+    def prettify(self, path, working_dir="."):
+        """Runs code formatting using prettier on the given path
+
+        Parameters
+        ----------
+        path : str
+            Filepath or directory to run prettier on
+        working_dir : str
+            Directory from which command is run
+        """
+
+        subprocess.run([self.npx, "prettier", "--write", path],
+                       shell=False,
+                       cwd=working_dir)

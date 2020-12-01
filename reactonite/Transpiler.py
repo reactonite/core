@@ -426,9 +426,8 @@ class Transpiler:
             x.encode('utf-8').decode("utf-8").strip() for x in contents
         ]
         body_str = "".join(body_contents)
-        body_soup = BeautifulSoup(body_str, self.parser)
 
-        content_str = soup.Helmet.prettify() + body_soup.prettify()
+        content_str = soup.Helmet.prettify() + body_str
 
         for variable in react_variables:
             content_str = content_str.replace(
@@ -439,14 +438,15 @@ class Transpiler:
         react_function = "function " + function_name + "() {return (<>" + \
             content_str + "</>);}"
 
-        return """import React from 'react';
-import Helmet from 'react-helmet';
-{imports}
+        return """
+        import React from 'react';
+        import Helmet from 'react-helmet';
+        {imports}
 
-{function}
+        {function}
 
-export default App;
-""".format(function=react_function, imports=react_map['imports'])
+        export default App;
+        """.format(function=react_function, imports=react_map['imports'])
 
     def copyStaticFolderToDest(self):
         """Copies source static folder to the transpiled React code static

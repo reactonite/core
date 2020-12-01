@@ -5,8 +5,6 @@ from html.parser import HTMLParser
 
 from bs4 import BeautifulSoup
 
-from reactonite.Helpers import create_dir
-
 from .NodeWrapper import NodeWrapper
 
 # Patch soup.prettify to use 4 spaces

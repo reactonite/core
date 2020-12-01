@@ -86,7 +86,7 @@ def create_project(project_name):
 
     # Transpile once
     transpiler = Transpiler(
-        config_settings,
+        config_settings.get_config(),
         props_map=CONSTANTS.PROPS_MAP,
         verbose=True,
         create_project=True

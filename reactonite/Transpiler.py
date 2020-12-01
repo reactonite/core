@@ -1,25 +1,10 @@
 import os
-import re
 from distutils.dir_util import copy_tree
 from html.parser import HTMLParser
 
 from bs4 import BeautifulSoup
 
 from .NodeWrapper import NodeWrapper
-
-# Patch soup.prettify to use 4 spaces
-orig_prettify = BeautifulSoup.prettify
-r = re.compile(r'^(\s*)', re.MULTILINE)
-
-
-def prettify(self, encoding=None, formatter="minimal", indent_width=4):
-    return r.sub(
-        r'\1' * indent_width,
-        orig_prettify(self, encoding, formatter)
-    )
-
-
-BeautifulSoup.prettify = prettify
 
 
 class AttributesParser(HTMLParser):

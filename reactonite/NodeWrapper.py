@@ -30,8 +30,7 @@ class NodeWrapper:
 
     def check_react_install(self):
         """Checks the installation of Nodejs/npm/npx. If npm is not
-        available it throws an error and stops the execution of
-        the program.
+        available it throws an error.
 
         Raises
         ------
@@ -42,29 +41,27 @@ class NodeWrapper:
         try:
             subprocess.run([self.npx, "--version"],
                            shell=False,
-                           cwd=self.working_dir,
+                           cwd='.',
                            stdout=subprocess.DEVNULL)
         except Exception:
-            print("npx not found. Please install/reinstall node")
-            exit(1)
+            raise RuntimeError("npx not found. Please install/reinstall node")
 
         try:
             subprocess.run([self.npm, "--version"],
                            shell=False,
-                           cwd=self.working_dir,
+                           cwd='.',
                            stdout=subprocess.DEVNULL)
         except Exception:
-            print("npm not found. Please install/reinstall node")
-            exit(1)
+            raise RuntimeError("npm not found. Please install/reinstall node")
 
         try:
             subprocess.run([self.node, "--version"],
                            shell=False,
-                           cwd=self.working_dir,
+                           cwd='.',
                            stdout=subprocess.DEVNULL)
         except Exception:
-            print("nodejs not found. Please install/reinstall node")
-            exit(1)
+            raise RuntimeError("nodejs not found. Please install/reinstall \
+                node")
 
         # TODO: Log these version numbers
 
@@ -82,11 +79,12 @@ class NodeWrapper:
         """
 
         subprocess.run([self.npx, "create-react-app",
-                        self.app_name, "--use-npm"],
+                        project_name, "--use-npm"],
                        shell=False,
-                       cwd=self.working_dir)
-        src = os.path.join(self.working_dir, self.app_name)
-        dest = os.path.join(self.working_dir, rename_to)
+                       cwd=working_dir)
+
+        src = os.path.join(working_dir, project_name)
+        dest = os.path.join('.', rename_to)
         os.rename(src, dest)
 
     def install(self, package_name, working_dir):

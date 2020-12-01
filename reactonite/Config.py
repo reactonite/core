@@ -1,21 +1,27 @@
-import os
 import json
+import os
 
-from .Helpers import write_to_json_file, create_file
+from .Helpers import create_file, write_to_json_file
 
 
 class Config:
     """A Class to manage and maintain project configuration.
     One can add/remove/modify config variables and save/load
-    it easily.
+    it easily
 
     Attributes
     ----------
     config_path : str
-        Path of the configuration file from where to load/save.
-    load : bool, optional
-        Default: False
-        Whether to load from the config file upon creating object.
+        Path to configuration file from where to load/save
+    config : dict
+        Config settings dictionary
+
+    Parameters
+    ----------
+    config_path : str
+        Path to configuration file from where to load/save
+    load : bool
+        Whether to load config on object creation, default is False
     """
 
     def __init__(self, config_path, load=False):

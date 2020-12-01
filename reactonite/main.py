@@ -81,6 +81,11 @@ def create_project(project_name):
     init_src_dir_path = os.path.join(package_path, CONSTANTS.INIT_FILES_DIR)
     copy_tree(init_src_dir_path, src_dir)
 
+    # Move .gitignore to outerlayer
+    gitignore_src = os.path.join(src_dir, '.gitignore')
+    gitignore_dest = os.path.join(project_dir, '.gitignore')
+    os.rename(gitignore_src, gitignore_dest)
+
     # Create template config.json in project dir
     config_settings.save_config()
 

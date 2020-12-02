@@ -86,7 +86,7 @@ Opens the help page for ``reactonite`` commandline.
 
 .. code:: sh
 
-    $ reactonite
+    $ reactonite --help
     Usage: reactonite [OPTIONS] COMMAND [ARGS]...
 
     Entry point for Reactonite cli.
@@ -95,6 +95,7 @@ Opens the help page for ``reactonite`` commandline.
     --help  Show this message and exit.
 
     Commands:
+    build              Command to get a static build of your app after...
     create-project     Command for creating new Reactonite project from...
     start              Command to start realtime development transpiler for...
     transpile-project  Command for transpiling a Reactonite project built...
@@ -117,6 +118,16 @@ Starts watching for changes in Reactonite project ``src`` directory and builds t
 .. code:: sh
 
     $ reactonite start
+
+
+``reactonite build``
+~~~~~~~~~~~~~~~~~~~~
+
+Generates a static build of your transpiled React app to be deployed to server. Requires config.json to be configured properly.
+
+.. code:: sh
+
+    $ reactonite build
 
 
 ``reactonite transpile-project``

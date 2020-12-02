@@ -12,6 +12,8 @@ class DEFAULTS:
         Source directory for reactonite codebase.
     DEST_DIR : str
         Destination directory for React codebase.
+    STATIC_DIR : str
+        Static directory for HTML codebase.
     CONFIG_FILE_NAME : str
         Config file name for config variables.
     PROPS_MAP : dict
@@ -22,5 +24,6 @@ class DEFAULTS:
         self.INIT_FILES_DIR = 'init_src_dir'
         self.SRC_DIR = 'src'
         self.DEST_DIR = 'dist'
+        self.STATIC_DIR = 'static'
         self.CONFIG_FILE_NAME = 'config.json'
         self.PROPS_MAP = props_map

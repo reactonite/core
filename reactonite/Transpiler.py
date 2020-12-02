@@ -1,22 +1,10 @@
 import os
-import re
 from distutils.dir_util import copy_tree
 from html.parser import HTMLParser
 
 from bs4 import BeautifulSoup
-from reactonite.Helpers import create_dir
 
-
-# Patch soup.prettify to use 4 spaces
-orig_prettify = BeautifulSoup.prettify
-r = re.compile(r'^(\s*)', re.MULTILINE)
-
-
-def prettify(self, encoding=None, formatter="minimal", indent_width=4):
-    return r.sub(r'\1' * indent_width, orig_prettify(self, encoding, formatter))
-
-
-BeautifulSoup.prettify = prettify
+from .NodeWrapper import NodeWrapper
 
 
 class AttributesParser(HTMLParser):
@@ -276,10 +264,14 @@ class Transpiler:
 
     Attributes
     ----------
+    project_name : str
+        Name of the project as stored in config
     src_dir : str
         Path of the source directory within the project directory
     dest_dir : str
         Path to the transpiled React app within the project directory
+    static_dir : str
+        Name of static dir for HTML directory
     parser : str, optional
         Specify which parser to use for reading HTML files, defaults
         to "html.parser"
@@ -290,17 +282,21 @@ class Transpiler:
     def __init__(self,
                  config_settings,
                  props_map,
-                 verbose=False):
+                 verbose=False,
+                 create_project=False):
         """Transpiler initiator takes config settings and unpacks variables.
 
         Parameters
         ----------
         config_settings : dict
-            Path to src_dir and dest_dir as dict object, stored in config.json
+            project_name, src_dir, dest_dir, static_dir as dict object stored
+            in config.json
         props_map : dict
             Mapping of props for HTML to React used during transpilation
         verbose : bool, optional
             Specify the verbosity of the transpiler, deafults to False
+        create_project : bool, optional
+            Set to True if create project is calling method, deafults to False
 
         Raises
         ------
@@ -308,10 +304,19 @@ class Transpiler:
             Raised if the config_settings point to non existing dirs.
         """
 
+        self.project_name = config_settings["project_name"]
         self.src_dir = config_settings["src_dir"]
         self.dest_dir = config_settings["dest_dir"]
-
+        self.static_dir = config_settings["static_dir"]
         self.props_map = props_map
+        self.parser = "html.parser"
+        self.verbose = verbose
+
+        if create_project:
+            self.src_dir = os.path.join('.', self.project_name, self.src_dir)
+            self.dest_dir = os.path.join('.', self.project_name, self.dest_dir)
+
+        npm = NodeWrapper()
 
         if not os.path.exists(os.path.join(".", self.src_dir)):
             raise RuntimeError(
@@ -320,13 +325,21 @@ class Transpiler:
             )
 
         if not os.path.exists(os.path.join(".", self.dest_dir)):
-            raise RuntimeError(
-                "Destination directory doesn't exist at " +
-                str(self.dest_dir)
-            )
+            if create_project:
+                project_dir = os.path.join(".", self.project_name)
+                npm.create_react_app(
+                    project_name=self.project_name,
+                    working_dir=project_dir,
+                    rename_to=self.dest_dir
+                )
+            else:
+                npm.create_react_app(
+                    project_name=self.project_name,
+                    rename_to=self.dest_dir
+                )
 
-        self.parser = "html.parser"
-        self.verbose = verbose
+            # Install NPM packages
+            npm.install(package_name='react-helmet', working_dir=self.dest_dir)
 
     def __replaceAttrs(self, soup, tag_name, or_attrs, f_attrs):
         """Replaces the attrs for updated tags comparing original and final attrs.
@@ -407,13 +420,14 @@ class Transpiler:
 
         soup.head.name = 'Helmet'
 
+        contents = soup.body.contents
+
         body_contents = [
-            x.encode('utf-8').decode("utf-8").strip() for x in soup.body.contents
+            x.encode('utf-8').decode("utf-8").strip() for x in contents
         ]
         body_str = "".join(body_contents)
-        body_soup = BeautifulSoup(body_str, self.parser)
 
-        content_str = soup.Helmet.prettify() + body_soup.prettify()
+        content_str = soup.Helmet.prettify() + body_str
 
         for variable in react_variables:
             content_str = content_str.replace(
@@ -424,22 +438,23 @@ class Transpiler:
         react_function = "function " + function_name + "() {return (<>" + \
             content_str + "</>);}"
 
-        return """import React from 'react';
-import Helmet from 'react-helmet';
-{imports}
+        return """
+        import React from 'react';
+        import Helmet from 'react-helmet';
+        {imports}
 
-{function}
+        {function}
 
-export default App;
-""".format(function=react_function, imports=react_map['imports'])
+        export default App;
+        """.format(function=react_function, imports=react_map['imports'])
 
     def copyStaticFolderToDest(self):
         """Copies source static folder to the transpiled React code static
         folder inside src
         """
 
-        static_src_dir = os.path.join(self.src_dir, "static")
-        static_dest_dir = os.path.join(self.dest_dir, "src", "static")
+        static_src_dir = os.path.join(self.src_dir, self.static_dir)
+        static_dest_dir = os.path.join(self.dest_dir, "src", self.static_dir)
 
         if not os.path.exists(static_src_dir):
             return
@@ -469,10 +484,6 @@ export default App;
             extention
         RuntimeError
             Raised if the source html file is not found
-        RuntimeError
-            Raised if the source html file is missing a head tag
-        RuntimeError
-            Raised if the source html file is missing a body tag
         """
 
         _, filename = os.path.split(filepath)
@@ -490,7 +501,10 @@ export default App;
         filename = filenameWithNoExtension + ".js"
 
         if not os.path.isdir(os.path.join(self.dest_dir, 'src')):
-            create_dir(os.path.join(self.dest_dir, 'src'))
+            raise RuntimeError("Looks like your React project didn't get \
+                created please check your " + self.dest_dir + " for a src \
+                    folder")
+
         dest_filepath = os.path.join(self.dest_dir, 'src', filename)
 
         if self.verbose:
@@ -502,17 +516,14 @@ export default App;
         with open(filepath, 'r') as index:
             soup = BeautifulSoup(index, self.parser)
 
-        if soup.head is None:
-            raise RuntimeError("head tag missing from HTML file")
-        if soup.body is None:
-            raise RuntimeError("body tag missing from HTML file")
-
         with open(dest_filepath, 'w') as outfile:
             file_content = self.__generateReactFileContent(
                 soup,
                 filenameWithNoExtension
             )
             outfile.write(file_content)
+
+        NodeWrapper().prettify(path=dest_filepath)
 
     def transpile_project(self):
         """Runs initial checks like ensuring the source

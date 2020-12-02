@@ -1,16 +1,16 @@
+import _thread
 import os
 import sys
 from distutils.dir_util import copy_tree
-import _thread
 
 import click
 
+from .Config import Config
 from .Constants import DEFAULTS
 from .Helpers import create_dir
 from .NodeWrapper import NodeWrapper
 from .ReactoniteWatcher import ReactoniteWatcher
 from .Transpiler import Transpiler
-from .Config import Config
 
 
 @click.group()
@@ -42,7 +42,6 @@ def create_project(project_name):
     CONSTANTS = DEFAULTS()
 
     project_dir = os.path.join(".", project_name)
-    dest_dir = os.path.join(project_dir, CONSTANTS.DEST_DIR)
     src_dir = os.path.join(project_dir, CONSTANTS.SRC_DIR)
 
     # Valid project name checks
@@ -69,9 +68,10 @@ def create_project(project_name):
 
     config_file_path = os.path.join(project_dir, CONSTANTS.CONFIG_FILE_NAME)
     config_settings = Config(config_file_path)
+    config_settings.add_to_config("project_name", project_name)
     config_settings.add_to_config("src_dir", CONSTANTS.SRC_DIR)
     config_settings.add_to_config("dest_dir", CONSTANTS.DEST_DIR)
-    config_settings.add_to_config("project_name", project_name)
+    config_settings.add_to_config("static_dir", CONSTANTS.STATIC_DIR)
 
     # Create project directory
     create_dir(project_dir)
@@ -81,23 +81,20 @@ def create_project(project_name):
     init_src_dir_path = os.path.join(package_path, CONSTANTS.INIT_FILES_DIR)
     copy_tree(init_src_dir_path, src_dir)
 
+    # Move .gitignore to outerlayer
+    gitignore_src = os.path.join(src_dir, '.gitignore')
+    gitignore_dest = os.path.join(project_dir, '.gitignore')
+    os.rename(gitignore_src, gitignore_dest)
+
     # Create template config.json in project dir
     config_settings.save_config()
 
-    # Create react app
-    npm = NodeWrapper(project_name, working_dir=project_dir)
-    npm.create_react_app(rename_to=CONSTANTS.DEST_DIR)
-
-    # Install NPM packages
-    npm.install(package_name='react-helmet', working_dir=dest_dir)
-
     # Transpile once
-    transpiler = Transpiler({
-        "src_dir": src_dir,
-        "dest_dir": dest_dir
-        },
+    transpiler = Transpiler(
+        config_settings.get_config(),
         props_map=CONSTANTS.PROPS_MAP,
-        verbose=True
+        verbose=True,
+        create_project=True
     )
 
     transpiler.transpile_project()
@@ -134,21 +131,29 @@ def transpile_project(verbose):
 
 @cli.command()
 def start():
-    """Command to start realtime development transpiler for Reactonite.
-
-    Starts watching for changes in project directory and transpiles codebase.
+    """Command to start realtime development transpiler for Reactonite. It
+    starts react development server in a seperate thread as well and watches
+    for changes in project directory and transpiles codebase.
 
     Raises
     ------
     FileNotFoundError
-        If config.json file doesn't exist.
+        If config.json file doesn't exist
+    RuntimeError
+        If ReactJs development thread is not able to start
     """
 
     CONSTANTS = DEFAULTS()
     config_file = CONSTANTS.CONFIG_FILE_NAME
     config_settings = Config(config_file, load=True)
-
     dest_dir = config_settings.get("dest_dir")
+    # Initial transpile
+    transpiler = Transpiler(
+        config_settings.get_config(),
+        props_map=CONSTANTS.PROPS_MAP,
+        verbose=True
+    )
+    transpiler.transpile_project()
 
     npm = NodeWrapper()
     watcher = ReactoniteWatcher(config_settings.get_config())
@@ -156,15 +161,14 @@ def start():
     try:
         _thread.start_new_thread(npm.start, (os.path.join(".", dest_dir),))
     except Exception:
-        print("Error: unable to start thread")
+        raise RuntimeError("Unable to start ReactJs development thread")
+
     watcher.start()
 
 
 @cli.command()
 def build():
-    """Command to start realtime development transpiler for Reactonite.
-
-    Starts watching for changes in project directory and transpiles codebase.
+    """Command to get a static build of your app after transpilation.
 
     Raises
     ------
@@ -176,11 +180,20 @@ def build():
     config_file = CONSTANTS.CONFIG_FILE_NAME
     config_settings = Config(config_file, load=True)
 
-    npm = NodeWrapper(config_settings.get("project_name"),
-                      working_dir=config_settings.get("dest_dir"))
-    npm.build()
+    transpiler = Transpiler(
+        config_settings.get_config(),
+        props_map=CONSTANTS.PROPS_MAP,
+        verbose=True
+    )
+    transpiler.transpile_project()
+
+    dest_dir = config_settings.get("dest_dir")
+
+    npm = NodeWrapper()
+    npm.build(working_dir=dest_dir)
 
     # Move build folder to project_dir instead of dest_dir
-    npm_build = os.path.join(config_settings.get("dest_dir"), "build")
+    npm_build = os.path.join(dest_dir, "build")
     project_build = os.path.join(".", "build")
+
     os.rename(npm_build, project_build)

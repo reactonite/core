@@ -31,15 +31,14 @@ def test_create_react_app():
 
     create_dir(test_dir)
 
-    node = NodeWrapper(app_name=app_name,
-                       working_dir=test_dir)
-    node.create_react_app()
+    node = NodeWrapper()
+    node.create_react_app(app_name, "dist", test_dir)
 
     assert os.path.isdir(os.path.join(test_dir,
-                                      app_name))
+                                      "dist"))
 
     package_json_filepath = os.path.join(test_dir,
-                                         app_name,
+                                         "dist",
                                          "package.json")
     assert os.path.isfile(package_json_filepath)
     assert check_package_json(package_json_filepath)
@@ -49,10 +48,10 @@ def test_create_react_app():
 def test_install():
     test_dir = os.path.join(os.path.expanduser("~"),
                             "reactonite-test")
-    app_name = "test-app"
-    node = NodeWrapper(app_name=app_name,
-                       working_dir=os.path.join(test_dir, app_name))
-    node.install(package_name='react-helmet')
+    app_name = "dist"
+    node = NodeWrapper()
+    node.install(package_name='react-helmet',
+                 working_dir=os.path.join(test_dir, app_name))
 
     package_json_filepath = os.path.join(test_dir,
                                          app_name,
@@ -65,10 +64,9 @@ def test_install():
 def test_build():
     test_dir = os.path.join(os.path.expanduser("~"),
                             "reactonite-test")
-    app_name = "test-app"
-    node = NodeWrapper(app_name=app_name,
-                       working_dir=os.path.join(test_dir, app_name))
-    node.build()
+    app_name = "dist"
+    node = NodeWrapper()
+    node.build(working_dir=os.path.join(test_dir, app_name))
 
     build_dir = os.path.join(test_dir,
                              app_name,

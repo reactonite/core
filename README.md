@@ -3,12 +3,12 @@
    <h3 align="center">Reactonite</h3>
    
    <p align="center"><img src="https://github.com/SDOS2020/Team_3_Reactonite/workflows/Python%20Linter/badge.svg?branch=beta" />
-   <a onclick="window.open(this.href,'_blank');return false;" href="https://reactonite.github.io/reactonite/"><img src="https://img.shields.io/website?label=documentation&up_message=up&url=https%3A%2F%2Freactonite.github.io%2Freactonite%2F"/></p></a>
+   <a onclick="window.open(this.href,'_blank');return false;" href="https://reactonite.github.io/"><img src="https://img.shields.io/website?label=documentation&up_message=up&url=https%3A%2F%2Freactonite.github.io%2F"/></p></a>
 
    <p align="center">
       A transpiler to convert HTML to React code and PWAs ✨
       </br>
-      <a href="https://reactonite.github.io/reactonite/"><strong>Explore the Docs »</strong></a>
+      <a href="https://reactonite.github.io/"><strong>Explore the Docs »</strong></a>
       <br/>
       <a href="https://github.com/SDOS2020/Team_3_Reactonite/#table-of-contents">Table of Contents</a> . <a href="https://github.com/SDOS2020/Team_3_Reactonite/issues">Report Bug</a> . <a href="https://github.com/SDOS2020/Team_3_Reactonite/projects">View Project</a>
    </p>
@@ -97,7 +97,7 @@ $ pip install .
 
 ## Usage
 
-Once installed refer to the [documentation](https://reactonite.github.io/reactonite/) for the set of commands available with Reactonite cli or you can begin by typing `reactonite --help` which opens the help page for `reactonite` command line tool.
+Once installed refer to the [documentation](https://reactonite.github.io/) for the set of commands available with Reactonite cli or you can begin by typing `reactonite --help` which opens the help page for `reactonite` command line tool.
 
 ```sh
 $ reactonite --help

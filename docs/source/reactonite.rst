@@ -4,6 +4,14 @@ reactonite package
 Submodules
 ----------
 
+reactonite.Config module
+------------------------
+
+.. automodule:: reactonite.Config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 reactonite.Constants module
 ---------------------------
 

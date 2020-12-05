@@ -85,7 +85,7 @@ class NodeWrapper:
 
         src = os.path.join(working_dir, project_name)
         if rename_to is not None:
-            dest = os.path.join(working_dir, rename_to)
+            dest = os.path.join('.', rename_to)
             os.rename(src, dest)
 
     def install(self, package_name, working_dir):

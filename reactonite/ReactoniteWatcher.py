@@ -1,5 +1,6 @@
 import os
 import time
+import subprocess
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
@@ -131,6 +132,9 @@ class ReactoniteWatcher():
         """
 
         print(f"{event.src_path} has been modified")
+        subprocess.run(["reactonite", "transpile-project"],
+                       shell=False,
+                       cwd=None)
 
     def __on_moved(self, event):
         """This event is called when a file/directory

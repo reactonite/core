@@ -1,0 +1,4 @@
+[submodule "gui/grapesjs"]
+	path = gui/grapesjs
+	url = https://github.com/reactonite/grapesjs
+	branch = reactonite

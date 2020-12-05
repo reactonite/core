@@ -12,6 +12,25 @@ from .NodeWrapper import NodeWrapper
 from .ReactoniteWatcher import ReactoniteWatcher
 from .Transpiler import Transpiler
 
+from flask import Flask, request, make_response, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)
+
+@app.route('/grapesjs', methods=['POST'])
+def fetchCodeFromGrapesjs():
+    if request.method == 'POST':
+        try:
+            print(request.form['html'])
+            print(request.form['css'])
+            data = {'Status': 'Data Received Successfully'}
+            return make_response(jsonify(data), 200)
+        except Exception as e:
+            print('Error in handling POST Request - ', e)
+            data = {'Status': 'Error in Handling POST Request',
+                    'Error': str(e)}
+            return make_response(jsonify(data), 550)
 
 @click.group()
 def cli():
@@ -163,6 +182,10 @@ def start():
     except Exception:
         raise RuntimeError("Unable to start ReactJs development thread")
 
+    print('Starting Flask Server')
+    app.run(port=5000)
+    
+    print('Starting Watcher')
     watcher.start()
 
 

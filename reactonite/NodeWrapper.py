@@ -65,7 +65,7 @@ class NodeWrapper:
 
         # TODO: Log these version numbers
 
-    def create_react_app(self, project_name, rename_to=None, working_dir='.'):
+    def create_react_app(self, project_name, rename_to, working_dir='.'):
         """Creates a new react app and renames it as specified.
 
         Parameters
@@ -84,9 +84,8 @@ class NodeWrapper:
                        cwd=working_dir)
 
         src = os.path.join(working_dir, project_name)
-        if rename_to is not None:
-            dest = os.path.join(working_dir, rename_to)
-            os.rename(src, dest)
+        dest = os.path.join('.', rename_to)
+        os.rename(src, dest)
 
     def install(self, package_name, working_dir):
         """Installs the given package in npm and saves in package.json

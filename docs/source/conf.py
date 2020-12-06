@@ -72,5 +72,5 @@ html_static_path = ['_static']
 html_favicon = './_static/favicon.ico'
 
 html_js_files = [
-    'js/expand_li.js',
+    'js/custom.js'
 ]

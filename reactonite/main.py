@@ -22,8 +22,8 @@ CORS(app)
 def fetchCodeFromGrapesjs():
     if request.method == 'POST':
         try:
-            print(request.form['html'])
-            print(request.form['css'])
+            # print(request.form['html'])
+            # print(request.form['css'])
             data = {'Status': 'Data Received Successfully'}
             return make_response(jsonify(data), 200)
         except Exception as e:
@@ -182,12 +182,48 @@ def start():
     except Exception:
         raise RuntimeError("Unable to start ReactJs development thread")
 
-    print('Starting Flask Server')
-    app.run(port=5000)
-    
-    print('Starting Watcher')
+    # Starting Watcher
     watcher.start()
 
+@cli.command()
+def start_gui():
+    """Command to start realtime development transpiler and GUI for Reactonite. It
+    starts react development server and GUI in a seperate thread as well and watches
+    for changes in project directory and transpiles codebase.
+
+    Raises
+    ------
+    FileNotFoundError
+        If config.json file doesn't exist
+    RuntimeError
+        If ReactJs development thread is not able to start
+    """
+
+    CONSTANTS = DEFAULTS()
+    config_file = CONSTANTS.CONFIG_FILE_NAME
+    config_settings = Config(config_file, load=True)
+    dest_dir = config_settings.get("dest_dir")
+    # Initial transpile
+    transpiler = Transpiler(
+        config_settings.get_config(),
+        props_map=CONSTANTS.PROPS_MAP,
+        verbose=True
+    )
+    transpiler.transpile_project()
+
+    npm = NodeWrapper()
+    watcher = ReactoniteWatcher(config_settings.get_config())
+
+    try:
+        _thread.start_new_thread(npm.start, (os.path.join(".", dest_dir),))
+    except Exception:
+        raise RuntimeError("Unable to start ReactJs development thread")
+
+    # Starting Flask Server
+    app.run(port=5000)
+
+    # Starting Watcher
+    watcher.start()
 
 @cli.command()
 def build():

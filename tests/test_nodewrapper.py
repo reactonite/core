@@ -1,11 +1,11 @@
-import os
-import stat
 import json
+import os
 import shutil
-import pytest
+import stat
 
-from reactonite.NodeWrapper import NodeWrapper
+import pytest
 from reactonite.Helpers import create_dir
+from reactonite.NodeWrapper import NodeWrapper
 
 
 def delete_dir(filepath):
@@ -27,12 +27,15 @@ def check_package_json(filepath, extra_packages=[]):
 def test_create_react_app():
     test_dir = os.path.join(os.path.expanduser("~"),
                             "reactonite-test")
+    create_dir(test_dir)
     app_name = "test-app"
 
-    create_dir(test_dir)
-
-    node = NodeWrapper()
-    node.create_react_app(app_name, "dist", test_dir)
+    npm = NodeWrapper()
+    npm.create_react_app(
+        project_name=app_name,
+        working_dir=test_dir,
+        rename_to=os.path.join(test_dir, "dist")
+    )
 
     assert os.path.isdir(os.path.join(test_dir,
                                       "dist"))

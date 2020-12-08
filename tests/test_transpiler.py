@@ -75,11 +75,10 @@ def test_transpiler_transpileFile():
     transpiler = Transpiler(config, props_map, verbose=True)
 
     init_file_non_html_path = os.path.join(src_dir,
-                                           "index.js")
+                                           "main.css")
 
-    # init_file is not a HTML file
-    with pytest.raises(RuntimeError):
-        transpiler.transpileFile(init_file_non_html_path)
+    transpiler.transpileFile(init_file_non_html_path)
+    assert os.path.isfile(os.path.join(dest_src_dir, "main.css"))
 
     init_file_path = os.path.join(src_dir,
                                   "index.html")

@@ -113,7 +113,7 @@ def test_transpiler_transpileFile():
 
     # Check dest file is present with correct file name
     assert os.path.isfile(os.path.join(dest_src_dir,
-                                       "index.js"))
+                                       "App.js"))
 
     transpiler.transpileFile(init_file_path)
     dest_file_path = os.path.join(dest_src_dir, "App.js")

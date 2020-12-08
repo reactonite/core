@@ -76,7 +76,8 @@ def test_transpiler_transpileFile():
 
     init_file_non_html_path = os.path.join(src_dir,
                                            "main.css")
-
+    with open(init_file_non_html_path, 'w') as file:
+        file.write("")
     transpiler.transpileFile(init_file_non_html_path)
     assert os.path.isfile(os.path.join(dest_src_dir, "main.css"))
 

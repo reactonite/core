@@ -71,7 +71,6 @@ def create_project(project_name):
     config_settings.add_to_config("project_name", project_name)
     config_settings.add_to_config("src_dir", CONSTANTS.SRC_DIR)
     config_settings.add_to_config("dest_dir", CONSTANTS.DEST_DIR)
-    config_settings.add_to_config("static_dir", CONSTANTS.STATIC_DIR)
 
     # Create project directory
     create_dir(project_dir)

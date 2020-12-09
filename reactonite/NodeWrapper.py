@@ -79,7 +79,8 @@ class NodeWrapper:
         """
 
         subprocess.run([self.npx, "create-react-app",
-                        project_name, "--use-npm"],
+                        project_name, "--use-npm", "--template",
+                        "cra-template-pwa"],
                        shell=False,
                        cwd=working_dir)
 

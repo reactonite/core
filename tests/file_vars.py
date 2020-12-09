@@ -6,8 +6,8 @@ minimal_working_example = """<head>Test header</head>
 </body>
 """
 
-minimal_working_example_js = """import React from "react";
-import Helmet from "react-helmet";
+minimal_working_example_js = """import Helmet from "react-helmet";
+import React from "react";
 
 function App() {
   return (
@@ -53,8 +53,8 @@ full_working_example = """<!doctype html>
 </html>
 """
 
-full_working_example_js = """import React from "react";
-import Helmet from "react-helmet";
+full_working_example_js = """import Helmet from "react-helmet";
+import React from "react";
 
 function App() {
   return (
@@ -65,7 +65,6 @@ function App() {
           content="width=device-width, initial-scale=1, shrink-to-fit=no"
           name="viewport"
         />
-        <link rel="stylesheet" src="./static/main.css" />
         <title>Reactonite App</title>
       </Helmet>
       <div className="main">

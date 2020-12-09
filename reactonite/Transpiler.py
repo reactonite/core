@@ -473,7 +473,9 @@ class Transpiler:
         """
 
         styleTags = [style.extract() for style in soup.find_all('style')]
-        scriptTags = [script.extract() for script in soup.find_all('script', src=False)]
+        scriptTags = [
+            script.extract() for script in soup.find_all('script', src=False)
+        ]
         attributes_parser = AttributesParser()
         attributes_parser.feed(soup.prettify())
         tag_with_attributes = attributes_parser.data

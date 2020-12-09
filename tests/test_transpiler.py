@@ -7,7 +7,7 @@ from reactonite.Helpers import create_dir
 from reactonite.PropsMap import props_map
 from reactonite.Transpiler import Transpiler
 
-from .file_vars import (full_working_example, full_working_example_js,
+from file_vars import (full_working_example, full_working_example_js,
                         minimal_working_example, minimal_working_example_js)
 
 

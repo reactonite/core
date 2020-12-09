@@ -1,6 +1,5 @@
 import os
 import shutil
-import stat
 import uuid
 
 import pytest
@@ -9,7 +8,7 @@ from reactonite.PropsMap import props_map
 from reactonite.Transpiler import Transpiler
 
 from file_vars import (full_working_example, full_working_example_js,
-                       minimal_working_example, minimal_working_example_js)
+                        minimal_working_example, minimal_working_example_js)
 
 
 def create_random_tree(base_path, num_directories=3, num_files=5):

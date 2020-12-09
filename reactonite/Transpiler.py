@@ -3,7 +3,7 @@ import os
 from distutils.file_util import copy_file
 from html.parser import HTMLParser
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 
 from .NodeWrapper import NodeWrapper
 
@@ -55,7 +55,7 @@ class ReactCodeMapper:
     Call getReactMap method for converting tags fed for HTML and get
     corresponding React Mapping. Here's an usage example:
 
-    reactCodeMapper = ReactCodeMapper(destination_dir, props_map)
+    reactCodeMapper = ReactCodeMapper(source_dir, destination_dir, props_map)
     react_map = reactCodeMapper.getReactMap(tag_with_attributes)
     print(react_map)
 
@@ -63,6 +63,8 @@ class ReactCodeMapper:
     ----------
     CUSTOM_TAG_HANDLERS : dict
         Stores mapping correspoding to tags which are handled seperately.
+    src_dir : str
+        Source directory for the HTML codebase.
     dest_dir : str
         Destination directory for the React codebase.
     props_map : dict
@@ -73,21 +75,22 @@ class ReactCodeMapper:
         Stores newly created variables during transpilation.
     """
 
-    def __init__(self, dest_dir, props_map):
+    def __init__(self, src_dir, dest_dir, props_map):
+        self.src_dir = src_dir
         self.dest_dir = dest_dir
         self.props_map = props_map
         self.add_to_import = []
         self.add_variables = []
 
         self.__IMAGE_TAG_HANDLER = 'IMAGE_TAG_HANDLER'
-        self.__STYLE_TAG_HANDLER = 'STYLE_TAG_HANDLER'
         self.__SCRIPT_TAG_HANDLER = 'SCRIPT_TAG_HANDLER'
+        self.__STYLE_TAG_HANDLER = "STYLE_TAG_HANDLER"
         self.__LINK_TAG_HANDLER = 'LINK_TAG_HANDLER'
 
         self.CUSTOM_TAG_HANDLERS = {
             'img': self.__IMAGE_TAG_HANDLER,
-            'style': self.__STYLE_TAG_HANDLER,
             'script': self.__SCRIPT_TAG_HANDLER,
+            'style': self.__STYLE_TAG_HANDLER,
             'link': self.__LINK_TAG_HANDLER
         }
 
@@ -113,7 +116,7 @@ class ReactCodeMapper:
             varName += _ch
         return varName
 
-    def __getLinkInfo(self, link):
+    def __getLinkInfo(self, link, filepath_from_src, no_var=False):
         """Generates link information.
 
         If link is internal corresponding variable name is generated, for
@@ -123,6 +126,11 @@ class ReactCodeMapper:
         ----------
         link : str
             Link for filepath or external link.
+        filepath_from_src : str
+            Path to file from src.
+        no_var : bool, optional
+            To generate import variable or just import file, default is False
+            i.e. generate variable
 
         Returns
         -------
@@ -130,20 +138,33 @@ class ReactCodeMapper:
             Variable name generated from link or link in external case.
         """
 
-        if os.path.exists(os.path.join(self.dest_dir, 'src', link)):
-            var = self.__getSafeName(link)
-            self.add_to_import.append(
-                "import {var} from '{link}';".format(
-                    var=var,
-                    link=link
-                )
-            )
-            self.add_variables.append(var)
-            return "{" + var + "}"
-        else:
-            return link
+        if link:
+            pathToLink = os.path.join(self.src_dir, filepath_from_src, link)
+            pathToIndexLink = os.path.join(pathToLink, 'index.html')
+            if os.path.isfile(pathToLink) or os.path.isfile(pathToIndexLink):
+                var = self.__getSafeName(link)
+                if no_var:
+                    self.add_to_import.append(
+                        "import '{link}';".format(
+                            link=link
+                        )
+                    )
+                    return None
+                else:
+                    self.add_to_import.append(
+                        "import {var} from '{link}';".format(
+                            var=var,
+                            link=link
+                        )
+                    )
+                self.add_variables.append(var)
+                return "{" + var + "}"
+            else:
+                return link
 
-    def __getAttrsWithLink(self, attrs, linkAttr):
+    def __getAttrsWithLink(
+        self, attrs, linkAttr, filepath_from_src, no_var=False
+    ):
         """Generates attrs for tags having links to other files.
 
         If link is internal corresponding variable name is generated, for
@@ -156,6 +177,11 @@ class ReactCodeMapper:
         linkAttr : str
             Name of attr that correspond to link of file, example 'src' in
             case of script tag
+        filepath_from_src : str
+            Path to file from src directory.
+        no_var : bool, optional
+            To generate import variable or just import file, default is False
+            i.e. generate variable
 
         Returns
         -------
@@ -166,13 +192,19 @@ class ReactCodeMapper:
         final_attrs = {}
         for attrKey in attrs.keys():
             if attrKey == linkAttr:
-                link_info = self.__getLinkInfo(attrs[attrKey])
-                final_attrs['src'] = link_info
+                link_info = self.__getLinkInfo(
+                    attrs[attrKey],
+                    filepath_from_src,
+                    no_var=no_var
+                )
+                if link_info is None:
+                    return None
+                final_attrs[linkAttr] = link_info
             else:
                 final_attrs[attrKey] = attrs[attrKey]
         return final_attrs
 
-    def __customTagAttrsHandler(self, attrs, tag_handler):
+    def __customTagAttrsHandler(self, attrs, tag_handler, filepath_from_src):
         """Custom tag and attributes handler for parsing attrs from CUSTOM_TAG_HANDLERS
 
         Parameters
@@ -181,6 +213,8 @@ class ReactCodeMapper:
             Attributes for corresponding tag needed to be handled
         tag_handler : str
             Tag handler type to be used in mapping
+        filepath_from_src : str
+            Path to file from src directory
 
         Returns
         -------
@@ -190,20 +224,33 @@ class ReactCodeMapper:
 
         final_attrs = {}
         if tag_handler == self.__IMAGE_TAG_HANDLER:
-            final_attrs = self.__getAttrsWithLink(attrs, 'src')
-        elif tag_handler == self.__STYLE_TAG_HANDLER:
-            print(attrs)
+            final_attrs = self.__getAttrsWithLink(
+                attrs, 'src', filepath_from_src
+            )
         elif tag_handler == self.__SCRIPT_TAG_HANDLER:
             if 'src' in attrs.keys():
-                final_attrs = self.__getAttrsWithLink(attrs, 'src')
+                final_attrs = self.__getAttrsWithLink(
+                    attrs, 'src', filepath_from_src
+                )
             else:
                 return None
+        elif tag_handler == self.__STYLE_TAG_HANDLER:
+            return None
         elif tag_handler == self.__LINK_TAG_HANDLER:
-            final_attrs = self.__getAttrsWithLink(attrs, 'href')
+            # css variable was added delete other link tags
+            if attrs["rel"] == "stylesheet":
+                final_attrs = self.__getAttrsWithLink(
+                        attrs,
+                        'href',
+                        filepath_from_src,
+                        no_var=True
+                    )
+            return None
         return final_attrs
 
-    def __getRenamedAttrs(self, attrs):
-        """Generates renamed attributes correspoding to React.
+    def __getReactAttrs(self, attrs):
+        """Generates renamed attributes correspoding to React, and removes
+        inline style tags
 
         Parameters
         ----------
@@ -218,6 +265,8 @@ class ReactCodeMapper:
 
         final_attrs = {}
         for attrKey in attrs.keys():
+            if attrKey == "style":
+                continue
             if attrKey in self.props_map:
                 useKey = self.props_map[attrKey]
             else:
@@ -225,7 +274,7 @@ class ReactCodeMapper:
             final_attrs[useKey] = attrs[attrKey]
         return final_attrs
 
-    def getReactMap(self, tags):
+    def getReactMap(self, tags, filepath_from_src):
         """Wrapper to generate React Map object comprising of all data needed
         to convert HTML to React
 
@@ -233,6 +282,8 @@ class ReactCodeMapper:
         ----------
         tags : dict
             HTML attributes extracted using AttributesParser
+        filepath_from_src : str
+            Path to file from src directory
 
         Returns
         -------
@@ -248,11 +299,12 @@ class ReactCodeMapper:
         }
         for tag in tags:
             tag_name = list(tag.keys())[0]
-            attrs = self.__getRenamedAttrs(tag[tag_name])
+            attrs = self.__getReactAttrs(tag[tag_name])
             if tag_name in self.CUSTOM_TAG_HANDLERS:
                 attrs = self.__customTagAttrsHandler(
                     attrs,
-                    self.CUSTOM_TAG_HANDLERS[tag_name]
+                    self.CUSTOM_TAG_HANDLERS[tag_name],
+                    filepath_from_src
                 )
             final_map['tags'].append({tag_name: attrs})
         final_map['imports'] = "\n".join(self.add_to_import)
@@ -356,7 +408,22 @@ class Transpiler:
 
         if or_attrs == f_attrs:
             return
-        soup.find(tag_name, attrs=or_attrs).attrs = f_attrs
+
+        htmlTag = soup.find(tag_name, attrs=or_attrs)
+
+        upperAttrs = {}
+        lowerAttrs = {}
+
+        if htmlTag is None:
+            for attr in or_attrs.keys():
+                upperAttrs[attr] = or_attrs[attr].upper()
+                lowerAttrs[attr] = or_attrs[attr].lower()
+            htmlTag = soup.find(tag_name, attrs=upperAttrs)
+            if htmlTag is None:
+                htmlTag = soup.find(tag_name, attrs=lowerAttrs)
+
+        if not (htmlTag is None):
+            htmlTag.attrs = f_attrs
 
     def __deleteTag(self, soup, tag_name, attrs):
         """Deletes the tag corresponding to given tag_name and attrs.
@@ -371,9 +438,23 @@ class Transpiler:
             Dictonary consisting of original attributes of HTML.
         """
 
-        soup.find(tag_name, attrs=attrs).decompose()
+        htmlTag = soup.find(tag_name, attrs=attrs)
 
-    def __generateReactFileContent(self, soup, function_name):
+        upperAttrs = {}
+        lowerAttrs = {}
+        if htmlTag is None:
+            for attr in attrs.keys():
+                upperAttrs[attr] = attrs[attr].upper()
+                lowerAttrs[attr] = attrs[attr].lower()
+            htmlTag = soup.find(tag_name, attrs=upperAttrs)
+            if htmlTag is None:
+                htmlTag = soup.find(tag_name, attrs=lowerAttrs)
+        if not (htmlTag is None):
+            htmlTag.decompose()
+
+    def __generateReactFileContent(
+        self, soup, function_name, filepath_from_src
+    ):
         """Generates React code from HTML soup object.
 
         Parameters
@@ -382,6 +463,8 @@ class Transpiler:
             bs4.BeautifulSoup with HTML code to be transpiled.
         function_name : str
             Function name to be used from filename without extension.
+        filepath_from_src : str
+            Path to file from src directory
 
         Returns
         -------
@@ -389,12 +472,20 @@ class Transpiler:
             Content for React file.
         """
 
+        styleTags = [style.extract() for style in soup.find_all('style')]
+        scriptTags = [
+            script.extract() for script in soup.find_all('script', src=False)
+        ]
         attributes_parser = AttributesParser()
         attributes_parser.feed(soup.prettify())
         tag_with_attributes = attributes_parser.data
 
-        reactCodeMapper = ReactCodeMapper(self.dest_dir, self.props_map)
-        react_map = reactCodeMapper.getReactMap(tag_with_attributes)
+        reactCodeMapper = ReactCodeMapper(
+            self.src_dir, self.dest_dir, self.props_map
+        )
+        react_map = reactCodeMapper.getReactMap(
+            tag_with_attributes, filepath_from_src
+        )
 
         final_tags = react_map['tags']
         react_variables = react_map['variables']
@@ -416,7 +507,17 @@ class Transpiler:
                     or_tag_name
                 )
 
-        soup.head.name = 'Helmet'
+        reactHead = None
+        if soup.head:
+            soup.head.name = 'Helmet'
+            reactHead = soup.Helmet
+        else:
+            if len(styleTags):
+                reactHead = soup.new_tag('Helmet')
+
+        if len(styleTags):
+            for style in styleTags:
+                reactHead.append(style)
 
         contents = soup.body.contents
 
@@ -425,7 +526,11 @@ class Transpiler:
         ]
         body_str = "".join(body_contents)
 
-        content_str = soup.Helmet.prettify() + body_str
+        if reactHead:
+            content_str = reactHead.prettify() + body_str
+            react_map['imports'] += "import Helmet from 'react-helmet';"
+        else:
+            content_str = body_str
 
         for variable in react_variables:
             content_str = content_str.replace(
@@ -433,18 +538,34 @@ class Transpiler:
                 '{' + variable + '}'
             )
 
-        react_function = "function " + function_name + "() {return (<>" + \
-            content_str + "</>);}"
+        if len(scriptTags):
+            react_map['imports'] += "import React, { useEffect } from 'react';"
+            scriptContent = ""
+            for script in scriptTags:
+                scriptContent += "".join(script.contents)
+            useEffect = "useEffect(() => {" + scriptContent + "}, []);"
+        else:
+            react_map['imports'] += "import React from 'react';"
+            useEffect = ""
+
+        if len(styleTags):
+            content_str = content_str.replace("<style>", "<style>{`")
+            content_str = content_str.replace("</style>", "`}</style>")
+
+        react_function = "function " + function_name + "() {  " + useEffect + \
+            "  return (<>" + content_str + "</>);}"
 
         return """
-        import React from 'react';
-        import Helmet from 'react-helmet';
         {imports}
 
         {function}
 
-        export default App;
-        """.format(function=react_function, imports=react_map['imports'])
+        export default {function_name};
+        """.format(
+            function_name=function_name,
+            function=react_function,
+            imports=react_map['imports']
+        )
 
     def transpileFile(self, filepath):
         """Transpiles the source HTML file given at the given filepath
@@ -505,11 +626,16 @@ class Transpiler:
         with open(filepath, 'r') as index:
             soup = BeautifulSoup(index, self.parser)
 
+        # Remove all comments
+        comments = soup.findAll(text=lambda text: isinstance(text, Comment))
+        [comment.extract() for comment in comments]
+
         os.makedirs(os.path.dirname(dest_filepath), exist_ok=True)
         with open(dest_filepath, 'w') as outfile:
             file_content = self.__generateReactFileContent(
                 soup,
-                filenameWithNoExtension
+                filenameWithNoExtension,
+                filePathFromSrc
             )
             outfile.write(file_content)
 

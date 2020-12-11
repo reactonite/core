@@ -73,6 +73,8 @@ class ReactCodeMapper:
         Stores imports corresponding to variables created during transpilation.
     add_variables : list
         Stores newly created variables during transpilation.
+    router_link_imported : bool, optional
+        Saves wether Link tag needs to be imported for current page.
     """
 
     def __init__(self, src_dir, dest_dir, props_map):
@@ -81,13 +83,16 @@ class ReactCodeMapper:
         self.props_map = props_map
         self.add_to_import = []
         self.add_variables = []
+        self.router_link_imported = False
 
+        self.__A_TAG_HANDLER = 'A_TAG_HANDLER'
         self.__IMAGE_TAG_HANDLER = 'IMAGE_TAG_HANDLER'
         self.__SCRIPT_TAG_HANDLER = 'SCRIPT_TAG_HANDLER'
         self.__STYLE_TAG_HANDLER = "STYLE_TAG_HANDLER"
         self.__LINK_TAG_HANDLER = 'LINK_TAG_HANDLER'
 
         self.CUSTOM_TAG_HANDLERS = {
+            'a': self.__A_TAG_HANDLER,
             'img': self.__IMAGE_TAG_HANDLER,
             'script': self.__SCRIPT_TAG_HANDLER,
             'style': self.__STYLE_TAG_HANDLER,
@@ -204,6 +209,55 @@ class ReactCodeMapper:
                 final_attrs[attrKey] = attrs[attrKey]
         return final_attrs
 
+    def __getAttrsForRouterLink(
+        self, attrs, filepath_from_src
+    ):
+        """Generates attrs for A tag having links to other files.
+
+        If link is internal that is checked and also link is generated is
+        generated, for external link it is returned.
+
+        Parameters
+        ----------
+        attrs : dict
+            Attributes of tag to be worked upon.
+        filepath_from_src : str
+            Path to file from src directory.
+
+        Returns
+        -------
+        tuple
+            Tuple of final dictonary of attributes with link handled and
+            information about internal link
+        """
+
+        final_attrs = {}
+        is_internal = False
+        for attrKey in attrs.keys():
+            if attrKey == "href":
+                href_info = attrs[attrKey]
+                pathRef = os.path.join(
+                    self.src_dir, filepath_from_src, href_info
+                )
+                pathRefIndex = os.path.join(
+                    self.src_dir, filepath_from_src, href_info, "index.html"
+                )
+                if os.path.isfile(pathRef) or os.path.isfile(pathRefIndex):
+                    htmlPath = os.path.normpath(
+                        os.path.join(filepath_from_src, href_info)
+                    )
+                    jsPath = '/'.join(htmlPath.split(os.path.sep))
+                    jsPath = jsPath.replace(".html", "")
+                    if jsPath == "index":
+                        jsPath = "/"
+                    is_internal = True
+                    final_attrs["to"] = jsPath
+                else:
+                    final_attrs["href"] = href_info
+            else:
+                final_attrs[attrKey] = attrs[attrKey]
+        return final_attrs, is_internal
+
     def __customTagAttrsHandler(self, attrs, tag_handler, filepath_from_src):
         """Custom tag and attributes handler for parsing attrs from CUSTOM_TAG_HANDLERS
 
@@ -223,7 +277,16 @@ class ReactCodeMapper:
         """
 
         final_attrs = {}
-        if tag_handler == self.__IMAGE_TAG_HANDLER:
+        if tag_handler == self.__A_TAG_HANDLER:
+            final_attrs, is_internal_link = self.__getAttrsForRouterLink(
+                attrs, filepath_from_src
+            )
+            if not self.router_link_imported and is_internal_link:
+                self.add_to_import.append(
+                    'import {Link} from "react-router-dom";'
+                )
+                self.router_link_imported = True
+        elif tag_handler == self.__IMAGE_TAG_HANDLER:
             final_attrs = self.__getAttrsWithLink(
                 attrs, 'src', filepath_from_src
             )
@@ -323,6 +386,8 @@ class Transpiler:
         Path of the source directory within the project directory
     dest_dir : str
         Path to the transpiled React app within the project directory
+    index_routes : dict
+        Stores Routes data corresponding to different pages for index.js
     parser : str, optional
         Specify which parser to use for reading HTML files, defaults
         to "html.parser"
@@ -359,6 +424,7 @@ class Transpiler:
         self.src_dir = config_settings["src_dir"]
         self.dest_dir = config_settings["dest_dir"]
         self.props_map = props_map
+        self.index_routes = {}
         self.parser = "html.parser"
         self.verbose = verbose
 
@@ -390,6 +456,10 @@ class Transpiler:
 
             # Install NPM packages
             npm.install(package_name='react-helmet', working_dir=self.dest_dir)
+            npm.install(
+                package_name='react-router-dom',
+                working_dir=self.dest_dir
+            )
 
     def __replaceAttrs(self, soup, tag_name, or_attrs, f_attrs):
         """Replaces the attrs for updated tags comparing original and final attrs.
@@ -424,6 +494,8 @@ class Transpiler:
 
         if not (htmlTag is None):
             htmlTag.attrs = f_attrs
+            if tag_name == "a" and "to" in f_attrs:
+                htmlTag.name = "Link"
 
     def __deleteTag(self, soup, tag_name, attrs):
         """Deletes the tag corresponding to given tag_name and attrs.
@@ -462,7 +534,8 @@ class Transpiler:
         soup : BeautifulSoup
             bs4.BeautifulSoup with HTML code to be transpiled.
         function_name : str
-            Function name to be used from filename without extension.
+            Function name to be used from filename without extension with
+            first letter capitalized
         filepath_from_src : str
             Path to file from src directory
 
@@ -567,6 +640,137 @@ class Transpiler:
             imports=react_map['imports']
         )
 
+    def __getReactComponentName(self, link):
+        """Generates safe name for React compnents from path to file.
+
+        Parameters
+        ----------
+        link : str
+            Path to file for which varibale is created.
+
+        Returns
+        -------
+        str
+            Variable name generated from link
+        """
+
+        varName = ""
+        for ch in link:
+            _ch = ch
+            if not ch.isalnum():
+                _ch = '_'
+            varName += _ch
+        return "REACTONITE" + varName.upper()
+
+    def __generateIndexJsContent(self):
+        """Generates content for index.js file in React codebase with handled routes
+
+        Returns
+        -------
+        str
+            Content for index.js file in React codebase
+        """
+
+        router = """import {
+                        BrowserRouter as Router,
+                        Switch,
+                        Route
+                    } from "react-router-dom";"""
+
+        imports = []
+        routes = []
+
+        for link, path in self.index_routes.items():
+            componentName = self.__getReactComponentName(path)
+            importReact = 'import ' + componentName + ' from "' + path + '";'
+            imports.append(importReact)
+            routeReact = """
+            <Route path="/{link}">
+                <{componentName} />
+            </Route>
+            """.format(link=link, componentName=componentName)
+            routes.append(routeReact)
+
+        imports = '\n'.join(imports)
+        routes = '\n'.join(routes)
+
+        return """
+        import React from "react";
+        import ReactDOM from "react-dom";
+        import * as serviceWorkerRegistration from \
+            "./serviceWorkerRegistration";
+        import reportWebVitals from "./reportWebVitals";
+        {router}
+
+        import App from "./App";
+        {imports}
+
+        ReactDOM.render(
+        <Router>
+            <Switch>
+            {routes}
+            <Route path="/">
+                <App />
+            </Route>
+            </Switch>
+        </Router>,
+        document.getElementById("root")
+        );
+
+        // If you want your app to work offline and load faster, you can change
+        // unregister() to register() below. Note this comes with some
+        // pitfalls. Learn more about service workers: https://cra.link/PWA
+        serviceWorkerRegistration.unregister();
+
+        // If you want to start measuring performance in your app, pass a
+        // function to log results (for example: reportWebVitals(console.log))
+        // or send to analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+        reportWebVitals();
+        """.format(imports=imports, routes=routes, router=router)
+
+    def __rebuildIndexJs(self):
+        """Generates the index.js for React apps entry point, needed to handle
+        links to pages
+
+        Raises
+        ------
+        RuntimeError
+            Raised if the index.js file is not found in dest_dir
+        """
+
+        pathToIndexJs = os.path.join(self.dest_dir, 'src', 'index.js')
+        if not os.path.isfile(pathToIndexJs):
+            raise RuntimeError("Looks like you are missing index.js file in \
+                React directory! It seems to be an NPM/React issue rather.")
+
+        with open(pathToIndexJs, 'w') as outfile:
+            file_content = self.__generateIndexJsContent()
+            outfile.write(file_content)
+
+        NodeWrapper().prettify(path=pathToIndexJs)
+
+    def __addRoutesToIndexLinkArray(self, filePathFromSrc, filenameNoExt):
+        """Adds links to self.index_routes to be used in index.js generation
+
+        Parameters
+        ----------
+        filePathFromSrc : str
+            Path to the folder where file is in dest_dir folder from src
+        filenameNoExt : str
+            Filename with no extension
+        """
+
+        if filenameNoExt == "index":
+            htmlPath = os.path.normpath(filePathFromSrc)
+            jsPath = '/'.join(htmlPath.split(os.path.sep))
+            self.index_routes[jsPath] = "./" + jsPath + "/index"
+        else:
+            htmlPath = os.path.normpath(os.path.join(
+                filePathFromSrc, filenameNoExt
+            ))
+            jsPath = '/'.join(htmlPath.split(os.path.sep))
+            self.index_routes[jsPath] = "./" + jsPath
+
     def transpileFile(self, filepath):
         """Transpiles the source HTML file given at the given filepath
         to a React code, which is then copied over to the React build
@@ -603,8 +807,11 @@ class Transpiler:
         if not os.path.isfile(filepath):
             raise RuntimeError("{} file not found".format(filepath))
 
+        is_entry_point = False
         entry_point_html = os.path.join(self.src_dir, 'index.html')
+
         if entry_point_html == filepath:
+            is_entry_point = True
             filenameWithNoExtension = "App"
 
         filename = filenameWithNoExtension + ".js"
@@ -617,6 +824,7 @@ class Transpiler:
         dest_filepath = os.path.join(
             self.dest_dir, 'src', filePathFromSrc, filename
         )
+
         if self.verbose:
             print(
                 "Transpiling file " + str(filepath) +
@@ -634,12 +842,17 @@ class Transpiler:
         with open(dest_filepath, 'w') as outfile:
             file_content = self.__generateReactFileContent(
                 soup,
-                filenameWithNoExtension,
+                filenameWithNoExtension.capitalize(),
                 filePathFromSrc
             )
             outfile.write(file_content)
 
         NodeWrapper().prettify(path=dest_filepath)
+
+        if not is_entry_point:
+            self.__addRoutesToIndexLinkArray(
+                filePathFromSrc, filenameWithNoExtension
+            )
 
     def transpile_project(self):
         """Runs initial checks like ensuring the source
@@ -668,3 +881,5 @@ class Transpiler:
                 self.transpileFile(
                     filename
                 )
+
+        self.__rebuildIndexJs()

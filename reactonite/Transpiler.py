@@ -313,7 +313,7 @@ class ReactCodeMapper:
 
     def __getReactAttrs(self, attrs):
         """Generates renamed attributes correspoding to React, and removes
-        inline style tags
+        inline style tags and tags starting with on like onclick etc.
 
         Parameters
         ----------
@@ -329,6 +329,8 @@ class ReactCodeMapper:
         final_attrs = {}
         for attrKey in attrs.keys():
             if attrKey == "style":
+                continue
+            if attrKey.startswith("on"):
                 continue
             if attrKey in self.props_map:
                 useKey = self.props_map[attrKey]

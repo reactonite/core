@@ -261,15 +261,16 @@
           </div>
           <div class="card-container">
             <div class="card card-shadow col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2 reveal">
-              <form action="" class="reveal-content">
+              <form class="reveal-content" id="contactForm">
                 <div class="form-group">
-                  <input type="email" class="form-control" id="email" placeholder="Email">
+                  <input type="email" class="form-control" id="emailForm" placeholder="Email" required>
                 </div>
                 <div class="form-group">
-                  <input type="text" class="form-control" id="subject" placeholder="Subject">
+                  <input type="text" class="form-control" id="subjectForm" placeholder="Subject" required>
                 </div>
                 <div class="form-group">
-                  <textarea class="form-control" rows="3" placeholder="Enter your message"></textarea>
+                  <textarea class="form-control" id="messageForm" rows="3" placeholder="Enter your message"
+                    required></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">Send message</button>
               </form>
@@ -297,8 +298,20 @@
   </footer>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function (event) {
-      console.log("Hello World! From Script Tag using Event Listeners");
+    document.getElementById("contactForm").addEventListener('submit', function (event) {
+      event.preventDefault();
+      var email = document.getElementById("emailForm")
+      var subject = document.getElementById("subjectForm")
+      var message = document.getElementById("messageForm")
+      const formUrl =
+        "https://docs.google.com/forms/d/e/1FAIpQLSeKU3CNWCLBn6yN1nppdYm7ZUmuNDjb2BhQ1DVUf9fHv6pRYw/formResponse?entry.815887852=" +
+        email.value + "&entry.129154247=" + subject.value + "&entry.500869233=" + message.value
+      const xmlHttp = new XMLHttpRequest();
+      xmlHttp.open('GET', formUrl);
+      xmlHttp.send(null);
+      email.value = "";
+      subject.value = "";
+      message.value = "";
     });
   </script>
 

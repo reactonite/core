@@ -12,8 +12,12 @@ from .NodeWrapper import NodeWrapper
 from .ReactoniteWatcher import ReactoniteWatcher
 from .Transpiler import Transpiler
 
+from reactonite import __version__
+
 
 @click.group()
+@click.version_option(__version__)
+@click.pass_context
 def cli():
     """Entry point for Reactonite cli."""
 

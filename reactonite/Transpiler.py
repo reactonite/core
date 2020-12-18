@@ -860,7 +860,11 @@ class Transpiler:
         """Runs initial checks like ensuring the source
         directories exist, and the source file is present.
         After that, copies non html files and transpiles the source.
-
+        Parameters
+        ----------
+        copy_static : bool
+            will copy non .html files if true, only .html files will be 
+            transpiled if false
         Raises
         ------
         RuntimeError

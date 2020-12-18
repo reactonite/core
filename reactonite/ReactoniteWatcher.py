@@ -1,8 +1,12 @@
 import os
 import time
+import shutil
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
+
+from .Transpiler import Transpiler
+from .Constants import DEFAULTS
 
 
 class ReactoniteWatcher():
@@ -62,6 +66,12 @@ class ReactoniteWatcher():
         self.case_sensitive = True
         self.recursive = recursive
 
+        CONSTANTS = DEFAULTS()
+        self.transpiler = Transpiler(
+            config_settings,
+            props_map=CONSTANTS.PROPS_MAP,
+            verbose=True)
+
     def start(self):
         """Runs the watchdog service on the given path. Handles
         various events to different functions as per the
@@ -105,8 +115,15 @@ class ReactoniteWatcher():
         event : obj
             An event object containing necessary details about it.
         """
-
         print(f"{event.src_path} has been created!")
+        if os.path.isdir(event.src_path):
+            return
+        if os.path.isfile(event.src_path) or os.path.islink(event.src_path):
+            try:
+                self.transpiler.transpile_project()
+            except:
+                print("transpile project failed")
+        
 
     def __on_deleted(self, event):
         """This event is called when a file/directory
@@ -119,7 +136,12 @@ class ReactoniteWatcher():
         """
 
         print(f"deleted {event.src_path}!")
-
+        try:
+            self.transpiler.transpile_project(copy_static=False)
+        except:
+            print("transpile project failed")
+        self.__delete_file(event.src_path)
+    
     def __on_modified(self, event):
         """This event is called when a file/directory
         is modified.
@@ -129,8 +151,11 @@ class ReactoniteWatcher():
         event : obj
             An event object containing necessary details about it.
         """
-
         print(f"{event.src_path} has been modified")
+        if os.path.isdir(event.src_path):
+            return
+        if os.path.isfile(event.src_path) or os.path.islink(event.src_path):
+            self.__new_file(event.src_path)
 
     def __on_moved(self, event):
         """This event is called when a file/directory
@@ -143,3 +168,41 @@ class ReactoniteWatcher():
         """
 
         print(f"moved {event.src_path} to {event.dest_path}")
+        self.__delete_file(event.src_path)
+        self.__new_file(event.dest_path)
+        try:
+            self.transpiler.transpile_project(copy_static=False)
+        except:
+            print("transpile project failed")
+
+    def __new_file(self, filepath):
+        _, filename = os.path.split(filepath)
+        try:
+            self.transpiler.transpileFile(filepath)
+        except:
+            print("transpiler failed")
+
+    def __delete_file(self, filepath):
+        filePathFromSrc, _ = os.path.split(filepath[filepath.find('src') + 4:])
+        _, filename = os.path.split(filepath)
+        filenameWithNoExtension, file_extension = os.path.splitext(filename)
+        if file_extension == ".html":
+            filename = filenameWithNoExtension + ".js"
+        dest_filepath = os.path.join(
+                self.dest_dir, 'src', filePathFromSrc, filename
+            )
+        # dest_filepath can be a dir also
+        print("removing", dest_filepath)
+        try:
+            self.__remove(dest_filepath)
+        except:
+            print("could not remove the file")
+        return
+
+    def __remove(self, path):
+        if os.path.isfile(path) or os.path.islink(path):
+            os.remove(path)  # remove the file
+        elif os.path.isdir(path):
+            shutil.rmtree(path)  # remove dir and all contains
+        else:
+            raise ValueError("file {} is not a file or dir.".format(path))

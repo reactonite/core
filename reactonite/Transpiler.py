@@ -856,11 +856,15 @@ class Transpiler:
                 filePathFromSrc, filenameWithNoExtension
             )
 
-    def transpile_project(self):
+    def transpile_project(self, copy_static=True):
         """Runs initial checks like ensuring the source
         directories exist, and the source file is present.
         After that, copies non html files and transpiles the source.
-
+        Parameters
+        ----------
+        copy_static : bool
+            will copy non .html files if true, only .html files will be 
+            transpiled if false
         Raises
         ------
         RuntimeError
@@ -878,10 +882,13 @@ class Transpiler:
         if self.verbose:
             print("Transpiling files...")
 
-        for filename in glob.iglob(self.src_dir + '**/**', recursive=True):
-            if os.path.isfile(filename):
-                self.transpileFile(
-                    filename
-                )
+        for filepath in glob.iglob(self.src_dir + '**/**', recursive=True):
+            if os.path.isfile(filepath):
+                _, filename = os.path.split(filepath)
+                _, file_extension = os.path.splitext(filename)
+                if file_extension == ".html" or copy_static:           
+                    self.transpileFile(
+                        filepath
+                    )
 
         self.__rebuildIndexJs()

@@ -12,6 +12,7 @@ from .NodeWrapper import NodeWrapper
 from .ReactoniteWatcher import ReactoniteWatcher
 from .Transpiler import Transpiler
 
+from reactonite import __version__
 from flask import Flask, request, make_response, jsonify
 from flask_cors import CORS
 
@@ -33,7 +34,9 @@ def fetchCodeFromGrapesjs():
             return make_response(jsonify(data), 550)
 
 @click.group()
-def cli():
+@click.version_option(__version__)
+@click.pass_context
+def cli(ctx):
     """Entry point for Reactonite cli."""
 
     pass

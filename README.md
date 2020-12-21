@@ -44,7 +44,7 @@ Here's the key features added to Reactonite:
 - Act as a wrapper to NPM
 - Allow importing of already created HTML file components
 - Hot Reloading
-- Support custom scss, styled-components, material icons etc. :smile:
+- Support custom scss, js, css etc. :smile:
 
 ### Built With
 
@@ -60,10 +60,10 @@ To get this repo up and running on your local machine follow these simple steps.
 
 Here's a list of things you'll need to have prior to installing the software.
 
-- python
-- npm
-- nodejs
-- any modern web browser
+- Python
+- NPM
+- NodeJs
+- Any modern web browser
 
 ### Installation
 

@@ -24,6 +24,7 @@
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+  - [Development Setup](#development-setup)
 - [Usage](#usage)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -66,6 +67,14 @@ Here's a list of things you'll need to have prior to installing the software.
 
 ### Installation
 
+1. Use pip to install Reactonite
+
+```sh
+$ pip install reactonite
+```
+
+### Development Setup
+
 1. Setup virtual environment?
 
 ```sh
@@ -81,7 +90,7 @@ $ virtualenv venv
 $ git clone https://github.com/SDOS2020/Team_3_Reactonite.git
 ```
 
-2. Install the package either using pip or python setup tools
+3. Install the package either using pip or python setup tools
 
 ```sh
 $ python setup.py install
@@ -128,7 +137,7 @@ Contributions are what make the open source community such an amazing place to b
 
 ## License
 
-License yet to be decided. See `LICENSE` for more information once complete.
+MIT License. See `LICENSE` for more information once complete.
 
 <!-- CONTACT -->
 

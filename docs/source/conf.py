@@ -22,7 +22,7 @@ project = 'Reactonite'
 copyright = '2020, Reactonite'
 author = 'Reactonite'
 
-version = 'dev'
+version = '0.1.0'
 
 # The full version, including alpha/beta/rc tags
 release = version

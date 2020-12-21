@@ -860,11 +860,13 @@ class Transpiler:
         """Runs initial checks like ensuring the source
         directories exist, and the source file is present.
         After that, copies non html files and transpiles the source.
+
         Parameters
         ----------
-        copy_static : bool
-            will copy non .html files if true, only .html files will be 
-            transpiled if false
+        copy_static : bool, optional
+            Will copy non .html files if True, only .html files will be
+            transpiled if False, default True
+
         Raises
         ------
         RuntimeError
@@ -886,7 +888,7 @@ class Transpiler:
             if os.path.isfile(filepath):
                 _, filename = os.path.split(filepath)
                 _, file_extension = os.path.splitext(filename)
-                if file_extension == ".html" or copy_static:           
+                if file_extension == ".html" or copy_static:
                     self.transpileFile(
                         filepath
                     )

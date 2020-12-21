@@ -4,10 +4,26 @@ reactonite package
 Submodules
 ----------
 
+reactonite.Config module
+------------------------
+
+.. automodule:: reactonite.Config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 reactonite.Constants module
 ---------------------------
 
 .. automodule:: reactonite.Constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+reactonite.CreateHtmlCss module
+-------------------------------
+
+.. automodule:: reactonite.CreateHtmlCss
    :members:
    :undoc-members:
    :show-inheritance:

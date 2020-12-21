@@ -22,7 +22,7 @@ project = 'Reactonite'
 copyright = '2020, Reactonite'
 author = 'Reactonite'
 
-version = '0.0.1-alpha'
+version = '0.1.0'
 
 # The full version, including alpha/beta/rc tags
 release = version
@@ -72,5 +72,5 @@ html_static_path = ['_static']
 html_favicon = './_static/favicon.ico'
 
 html_js_files = [
-    'js/expand_li.js',
+    'js/custom.js'
 ]

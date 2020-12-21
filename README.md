@@ -3,12 +3,12 @@
    <h3 align="center">Reactonite</h3>
    
    <p align="center"><img src="https://github.com/SDOS2020/Team_3_Reactonite/workflows/Python%20Linter/badge.svg?branch=beta" />
-   <a onclick="window.open(this.href,'_blank');return false;" href="https://reactonite.github.io/reactonite/"><img src="https://img.shields.io/website?label=documentation&up_message=up&url=https%3A%2F%2Freactonite.github.io%2Freactonite%2F"/></p></a>
+   <a onclick="window.open(this.href,'_blank');return false;" href="https://reactonite.github.io/"><img src="https://img.shields.io/website?label=documentation&up_message=up&url=https%3A%2F%2Freactonite.github.io%2F"/></p></a>
 
    <p align="center">
       A transpiler to convert HTML to React code and PWAs ✨
       </br>
-      <a href="https://reactonite.github.io/reactonite/"><strong>Explore the Docs »</strong></a>
+      <a href="https://reactonite.github.io/"><strong>Explore the Docs »</strong></a>
       <br/>
       <a href="https://github.com/SDOS2020/Team_3_Reactonite/#table-of-contents">Table of Contents</a> . <a href="https://github.com/SDOS2020/Team_3_Reactonite/issues">Report Bug</a> . <a href="https://github.com/SDOS2020/Team_3_Reactonite/projects">View Project</a>
    </p>
@@ -24,6 +24,7 @@
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+  - [Development Setup](#development-setup)
 - [Usage](#usage)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -43,7 +44,7 @@ Here's the key features added to Reactonite:
 - Act as a wrapper to NPM
 - Allow importing of already created HTML file components
 - Hot Reloading
-- Support custom scss, styled-components, material icons etc. :smile:
+- Support custom scss, js, css etc. :smile:
 
 ### Built With
 
@@ -59,12 +60,20 @@ To get this repo up and running on your local machine follow these simple steps.
 
 Here's a list of things you'll need to have prior to installing the software.
 
-- python
-- npm
-- nodejs
-- any modern web browser
+- Python
+- NPM
+- NodeJs
+- Any modern web browser
 
 ### Installation
+
+1. Use pip to install Reactonite
+
+```sh
+$ pip install reactonite
+```
+
+### Development Setup
 
 1. Setup virtual environment?
 
@@ -81,7 +90,7 @@ $ virtualenv venv
 $ git clone https://github.com/SDOS2020/Team_3_Reactonite.git
 ```
 
-2. Install the package either using pip or python setup tools
+3. Install the package either using pip or python setup tools
 
 ```sh
 $ python setup.py install
@@ -97,7 +106,7 @@ $ pip install .
 
 ## Usage
 
-Once installed refer to the [documentation](https://reactonite.github.io/reactonite/) for the set of commands available with Reactonite cli or you can begin by typing `reactonite --help` which opens the help page for `reactonite` command line tool.
+Once installed refer to the [documentation](https://reactonite.github.io/) for the set of commands available with Reactonite cli or you can begin by typing `reactonite --help` which opens the help page for `reactonite` command line tool.
 
 ```sh
 $ reactonite --help
@@ -128,7 +137,7 @@ Contributions are what make the open source community such an amazing place to b
 
 ## License
 
-License yet to be decided. See `LICENSE` for more information once complete.
+MIT License. See `LICENSE` for more information once complete.
 
 <!-- CONTACT -->
 

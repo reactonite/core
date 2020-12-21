@@ -18,9 +18,8 @@ Here's the key features added to Reactonite:
 -  Transpile HTML code to React website
 -  Create PWAs and React applications as quickly as possible
 -  Act as a wrapper to NPM
--  Allow importing of already created HTML file components
 -  Hot Reloading
--  Support custom scss, styled-components, material icons etc.
+-  Support custom scss, js, css etc.
 
 
 Getting Started
@@ -43,34 +42,13 @@ software.
 Installation
 ------------
 
-1. Clone the reactonite repository to local machine.
+0. Install the package using pip
 
 .. code:: sh
 
-    $ git clone https://github.com/SDOS2020/Team_3_Reactonite.git
+    $ pip install reactonite
 
-1. Setup virtual environment?
-
-.. code:: sh
-
-    $ cd Team_3_Reactonite
-    $ python -m venv env
-    $ env\Scripts\activate    # For Windows
-    $ source env/bin/activate # For Linux
-
-> Not necessary but recommended to keep your environment clean.
-
-3. Install the package either using pip or python setup tools
-
-.. code:: sh
-
-    $ python setup.py install
-    # Use `develop` instead of `install` to get an editable build
-
-    # Alternatively run
-    $ pip install .
-
-4. You are good to go... 🎉
+1. You are good to go, yes it's that simple... 🎉
 
 
 Usage
@@ -86,18 +64,22 @@ Opens the help page for ``reactonite`` commandline.
 
 .. code:: sh
 
-    $ reactonite
+    $ reactonite --help
     Usage: reactonite [OPTIONS] COMMAND [ARGS]...
 
     Entry point for Reactonite cli.
 
     Options:
-    --help  Show this message and exit.
+    --version  Show the version and exit.
+    --help     Show this message and exit.
 
     Commands:
+    build              Command to get a static build of your app after...
     create-project     Command for creating new Reactonite project from...
+    gui                Command to start realtime development transpiler and...
     start              Command to start realtime development transpiler for...
     transpile-project  Command for transpiling a Reactonite project built...
+
 
 ``reactonite create-project PROJECT_NAME``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,6 +90,16 @@ Creates a Reactonite project with required directory structure. Change ``PROJECT
 
     $ reactonite create-project my-new-project
 
+    
+``reactonite gui PROJECT_NAME``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Creates a Reactonite project for GUI based development with required directory structure. Change ``PROJECT_NAME`` to your app name.
+
+.. code:: sh
+
+    $ reactonite gui my-new-project
+
 
 ``reactonite start``
 ~~~~~~~~~~~~~~~~~~~~
@@ -117,6 +109,16 @@ Starts watching for changes in Reactonite project ``src`` directory and builds t
 .. code:: sh
 
     $ reactonite start
+
+
+``reactonite build``
+~~~~~~~~~~~~~~~~~~~~
+
+Generates a static build of your transpiled React app to be deployed to server. Requires config.json to be configured properly.
+
+.. code:: sh
+
+    $ reactonite build
 
 
 ``reactonite transpile-project``

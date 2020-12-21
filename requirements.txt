@@ -6,3 +6,5 @@ pyflakes==2.2.0
 watchdog==0.10.3 
 beautifulsoup4==4.9.2	
 soupsieve==2.0.1
+Flask==1.1.2
+Flask-Cors==3.0.9

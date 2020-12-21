@@ -65,6 +65,31 @@ class NodeWrapper:
 
         # TODO: Log these version numbers
 
+    def install_grapesjs(self, project_dir):
+
+        cur_dir = project_dir
+
+        folders = next(os.walk(cur_dir))[1]
+
+        gui_dir = os.path.join(cur_dir, 'gui')
+
+        if 'gui' not in folders:
+            os.makedirs('gui')
+
+            grapesjs_path = 'https://github.com/reactonite/grapesjs/'
+
+            subprocess.run(['git', 'init'], shell=False, cwd=gui_dir)
+            subprocess.run(['git', 'remote', 'add', 'origin', grapesjs_path], shell=False, cwd=gui_dir)
+            subprocess.run(['git', 'pull', 'origin', 'master'], shell=False, cwd=gui_dir)
+            subprocess.run([self.npm, 'i'], shell=False, cwd=gui_dir)
+
+    def start_grapesjs(self, project_dir):
+
+        cur_dir = project_dir
+
+        gui_dir = os.path.join(cur_dir, 'gui')
+        subprocess.run([self.npm, 'start'], shell=False, cwd=gui_dir)
+
     def create_react_app(self, project_name, rename_to, working_dir='.'):
         """Creates a new react app and renames it as specified.
 

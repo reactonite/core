@@ -76,6 +76,7 @@ Opens the help page for ``reactonite`` commandline.
     Commands:
     build              Command to get a static build of your app after...
     create-project     Command for creating new Reactonite project from...
+    gui                Command to start realtime development transpiler and...
     start              Command to start realtime development transpiler for...
     transpile-project  Command for transpiling a Reactonite project built...
 
@@ -88,6 +89,16 @@ Creates a Reactonite project with required directory structure. Change ``PROJECT
 .. code:: sh
 
     $ reactonite create-project my-new-project
+
+    
+``reactonite gui PROJECT_NAME``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Creates a Reactonite project for GUI based development with required directory structure. Change ``PROJECT_NAME`` to your app name.
+
+.. code:: sh
+
+    $ reactonite gui my-new-project
 
 
 ``reactonite start``

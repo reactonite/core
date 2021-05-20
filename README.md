@@ -148,4 +148,4 @@ MIT License. See `LICENSE` for more information once complete.
 - Avi Garg - avi17223@iiitd.ac.in
 - Chirag Jain - chirag17041@iiitd.ac.in
 
-Project Link: [https://github.com/SDOS2020/Team_3_Reactonite](https://github.com/SDOS2020/Team_3_Reactonite)
+Project: [https://github.com/reactonite](https://github.com/reactonite)

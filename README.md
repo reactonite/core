@@ -122,8 +122,6 @@ Commands:
 ```
 <img src="docs\source\assets\Reactonite_NonGUI.gif" alt="Demo for using the Non GUI component" width="550">
 
-<!-- ![Reactonite_NonGUI](docs\source\assets\Reactonite_NonGUI.gif) -->
-
 <!-- ROADMAP -->
 
 

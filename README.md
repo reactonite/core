@@ -26,6 +26,8 @@
   - [Installation](#installation)
   - [Development Setup](#development-setup)
 - [Usage](#usage)
+  - [Demo using HTML](#demo-using-html)
+  - [Demo using GUI](#demo-using-gui)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
@@ -120,8 +122,11 @@ Options:
 Commands:
   ...
 ```
-<img src="docs\source\assets\Reactonite_NonGUI.gif" alt="Demo for using the Non GUI component" width="550">  
-<img src="docs\source\assets\Reactonite_GUI.gif" alt="Demo for using the GUI component" width="550" style="float:right">
+### Demo using HTML
+<img src="docs\source\assets\Reactonite_NonGUI.gif" alt="Demo for using the Non-GUI component">  
+
+### Demo using GUI
+<img src="docs\source\assets\Reactonite_GUI.gif" alt="Demo for using the GUI component">
 
 <!-- ROADMAP -->
 

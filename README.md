@@ -123,10 +123,10 @@ Commands:
   ...
 ```
 ### Demo using HTML
-<img src="docs\source\assets\Reactonite_NonGUI.gif" alt="Demo for using the Non-GUI component">  
+<img src="https://reactonite.github.io/assets/images/demos/non_gui_7_sept_2021.gif" alt="Demo for using the Non-GUI component">  
 
 ### Demo using GUI
-<img src="docs\source\assets\Reactonite_GUI.gif" alt="Demo for using the GUI component">
+<img src="https://reactonite.github.io/assets/images/demos/gui_7_sept_2021.gif" alt="Demo for using the GUI component">
 
 <!-- ROADMAP -->
 

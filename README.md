@@ -26,6 +26,8 @@
   - [Installation](#installation)
   - [Development Setup](#development-setup)
 - [Usage](#usage)
+  - [Demo using HTML](#demo-using-html)
+  - [Demo using GUI](#demo-using-gui)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
@@ -120,8 +122,15 @@ Options:
 Commands:
   ...
 ```
+### Demo using HTML
+<img src="https://reactonite.github.io/assets/images/demos/non_gui_7_sept_2021.gif" alt="Demo for using the Non-GUI component">  
+
+### Demo using GUI
+<img src="https://reactonite.github.io/assets/images/demos/gui_7_sept_2021.gif" alt="Demo for using the GUI component">
 
 <!-- ROADMAP -->
+
+
 
 ## Roadmap
 
